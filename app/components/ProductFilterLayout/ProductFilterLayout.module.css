@@ -1,0 +1,449 @@
+/* ================= WRAPPER ================= */
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 60vh;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+  padding: 56px 32px 60px 48px;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  background: white;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+}
+
+/* ================= FILTER SECTION ================= */
+
+.filterSection {
+  margin-bottom: 36px;
+}
+
+.filterSectionTitle {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #888;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 8px;
+}
+
+.filterSectionContent {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================= FILTER ITEM ================= */
+
+.filterItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: #111;
+  padding: 10px 0;
+  position: relative;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.filterItem::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #111;
+  transition: width 0.25s ease;
+}
+
+.filterItem:hover {
+  opacity: 0.7;
+}
+
+.filterItem:hover::after {
+  width: 100%;
+}
+
+.filterItemActive {
+  font-weight: 500;
+}
+
+.filterItemActive::after {
+  width: 100%;
+}
+
+/* ================= COLOR SWATCHES ================= */
+
+.colorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.colorSwatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  padding: 0;
+}
+
+.colorSwatch:hover {
+  border-color: #111;
+}
+
+.colorSwatchActive {
+  border-color: #111;
+  border-width: 2px;
+}
+
+.colorDot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: block;
+}
+
+/* ================= RANGE SLIDER ================= */
+
+.sliderContainer {
+  padding: 8px 7px 4px 7px;
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 400;
+  color: #111;
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.sliderTrack {
+  position: relative;
+  width: calc(100% - 16px);
+  padding-left: 28px;
+  height: 2px;
+  background: #e0e0e0;
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+.sliderFill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: #111;
+  border-radius: 1px;
+}
+
+.sliderThumb {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border: 2px solid #111;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.15s ease;
+  z-index: 2;
+}
+
+.sliderThumb:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.sliderThumb:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ================= RESET ================= */
+
+.resetBtn {
+  display: inline-block;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #888;
+  padding: 10px 0;
+  transition: color 0.2s ease;
+}
+
+.resetBtn:hover {
+  color: #111;
+}
+
+/* ================= MOBILE FILTER BUTTON ================= */
+
+.mobileFilterBtn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #111;
+  cursor: pointer;
+  position: relative;
+  margin: 20px 0 0 20px;
+  transition: border-color 0.2s ease;
+}
+
+.mobileFilterBtn:hover {
+  border-color: #111;
+}
+
+.filterBadge {
+  width: 6px;
+  height: 6px;
+  background: #111;
+  border-radius: 50%;
+  position: absolute;
+  top: 10px;
+  right: 14px;
+}
+
+/* ================= DRAWER ================= */
+
+.drawerOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.drawerOverlayVisible {
+  opacity: 1;
+}
+
+.drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 320px;
+  max-width: 85vw;
+  height: 100vh;
+  background: white;
+  z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid #eee;
+}
+
+.drawerTitle {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #111;
+}
+
+.drawerClose {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #111;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.drawerClose:hover {
+  opacity: 0.6;
+}
+
+.drawerContent {
+  padding: 24px 28px 60px;
+}
+
+/* ================= MAIN ================= */
+
+.main {
+  padding: 40px 48px 80px;
+  min-width: 0;
+}
+
+.resultCount {
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: #999;
+  margin-bottom: 32px;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 48px 28px;
+  align-items: start;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 20px;
+  text-align: center;
+}
+
+.emptyText {
+  font-size: 15px;
+  font-weight: 300;
+  color: #888;
+  margin-bottom: 28px;
+}
+
+.paginationWrapper {
+  margin-top: 64px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ================= TABLET ================= */
+
+@media (max-width: 1200px) {
+  .main {
+    padding: 36px 32px 70px;
+  }
+
+  .products {
+    gap: 40px 22px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .mobileFilterBtn {
+    display: inline-flex;
+  }
+
+  .drawer {
+    display: block;
+  }
+
+  .drawerOverlay {
+    display: block;
+    pointer-events: none;
+  }
+
+  .drawerOverlayVisible {
+    pointer-events: auto;
+  }
+
+  .main {
+    padding: 28px 24px 60px;
+  }
+
+  .products {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px 18px;
+  }
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+  .mobileFilterBtn {
+    margin: 16px 0 0 16px;
+  }
+
+  .main {
+    padding: 20px 18px 50px;
+  }
+
+  .products {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px 14px;
+  }
+
+  .resultCount {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileFilterBtn {
+    margin: 12px 0 0 12px;
+  }
+
+  .main {
+    padding: 16px 16px 40px;
+  }
+
+  .products {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .drawer {
+    width: 280px;
+  }
+
+  .filterItem {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,398 @@
+import type { Translations } from "./types";
+
+const fr: Translations = {
+  brand: {
+    name: "Aighis Byrca",
+    tagline: "Mode de Luxe",
+  },
+  nav: {
+    top: ["Mode", "Soldes", "Casa", "World", "MY AB"],
+    center: [
+      "COLLECTION ÉTÉ",
+      "CADEAUX",
+      "NOUVEAUTÉS",
+      "FEMME",
+      "HOMME",
+      "COLLECTION",
+      "SPORTSWEAR",
+      "LINGERIE",
+    ],
+    home: "Accueil",
+    search: "Rechercher",
+    wishlist: "Liste de souhaits",
+    login: "Connexion",
+  },
+  home: {
+    heroAlt: "Mode de Luxe",
+    newArrivals: "NOUVEAUTÉS",
+    women: "FEMME",
+    men: "HOMME",
+    shopNow: "ACHETER",
+    discover: "Découvrir",
+  },
+  categories: {
+    tops: "Hauts",
+    bottoms: "Bas",
+    underwear: "Lingerie",
+    bags: "Sacs",
+    springSummer: "Printemps-Été 2025",
+    intimate: "Collection Intime",
+    signature: "Collection Signature",
+  },
+  products: {
+    title: "Produits",
+    subtitle: "Découvrez notre dernière collection",
+    filters: [
+      "COLLECTION",
+      "VÊTEMENTS",
+      "SACS",
+      "CHAUSSURES",
+      "ACCESSOIRES",
+      "LUNETTES",
+      "ÉDITION LIMITÉE",
+      "CARTE CADEAU",
+      "DG EDIT",
+    ],
+    breadcrumbHome: "Accueil",
+    breadcrumbProducts: "Produits",
+    completeLook: "Compléter le Look",
+  },
+  productDetail: {
+    color: "Couleur",
+    size: "Taille",
+    sizeGuide: "Guide des tailles",
+    addToCart: "Ajouter au panier",
+    oneSize: "Taille unique",
+    productCode: "Code produit",
+    addToWishlist: "Ajouter à la liste de souhaits",
+    removeFromWishlist: "Retirer de la liste de souhaits",
+    description: "Description",
+    productDetails: "Détails du produit",
+    composition: "Composition",
+    fit: "Coupe",
+    compositionCare: "Composition & Entretien",
+    careInstructions: "Instructions d'entretien",
+    shippingReturns: "Livraison & Retours",
+    shipping: "Livraison",
+    returns: "Retours",
+  },
+  wishlist: {
+    title: "Ma Liste de Souhaits",
+    empty: "Votre liste est vide",
+    emptySubtitle: "Enregistrez vos articles préférés dans votre liste de souhaits.",
+    item: "article",
+    items: "articles",
+    browseProducts: "Voir les produits",
+  },
+  cart: {
+    title: "Panier",
+    empty: "Votre panier est vide",
+    emptySubtitle: "Votre panier est actuellement vide.",
+    item: "article",
+    items: "articles",
+    size: "Taille",
+    removeItem: "Retirer l'article",
+    orderSummary: "Récapitulatif",
+    subtotal: "Sous-total",
+    shipping: "Livraison",
+    complimentary: "Offerte",
+    total: "Total",
+    checkout: "Commander",
+    continueShopping: "Continuer mes achats",
+    currency: "Tnd",
+  },
+  checkout: {
+    title: "Validation",
+    subtitle: "Finalisez votre commande",
+    shippingAddress: "Adresse de Livraison",
+    fullName: "Nom Complet",
+    address: "Adresse",
+    city: "Ville",
+    postalCode: "Code Postal",
+    phone: "Téléphone",
+    paymentMethod: "Moyen de Paiement",
+    bankTransfer: "Virement Bancaire",
+    bankTransferDesc: "Effectuez un virement sur notre compte. La commande sera expédiée après confirmation du paiement.",
+    onDelivery: "Paiement à la Livraison",
+    onDeliveryDesc: "Payez en espèces à la réception de votre commande.",
+    d17: "D17",
+    d17Desc: "Payez avec votre carte de paiement D17.",
+    placeOrder: "Confirmer la Commande",
+    orderSummary: "Récapitulatif",
+    subtotal: "Sous-total",
+    shipping: "Livraison",
+    complimentary: "Offerte",
+    total: "Total",
+    currency: "Tnd",
+    processing: "Traitement en cours...",
+    success: "Commande Confirmée",
+    successMessage: "Merci pour votre commande. Vous recevrez une confirmation sous peu.",
+    backToShop: "Retour à la Boutique",
+    emptyCart: "Votre panier est vide",
+  },
+  womenPage: {
+    title: "Femme",
+    subtitle: "Découvrez notre collection femme",
+  },
+  menPage: {
+    title: "Homme",
+    subtitle: "Découvrez notre collection homme",
+  },
+  footer: {
+    storeLocator: "MAGASINS",
+    storeLocatorDesc:
+      "Entrez votre ville ou code postal pour trouver la boutique la plus proche.",
+    storeLocatorPlaceholder: "Rechercher par ville ou code postal",
+    search: "Rechercher",
+    subscribe: "NEWSLETTER",
+    subscribeDesc:
+      "Recevez des collections exclusives, des événements privés et des offres de luxe.",
+    emailPlaceholder: "Votre adresse email",
+    confirm: "Confirmer",
+    privacyPolicy: "J'accepte la Politique de Confidentialité.",
+    services: "SERVICES",
+    orderTracking: "SUIVI DE COMMANDE",
+    returns: "RETOURS",
+    legalArea: "MENTIONS LÉGALES",
+    contact: "CONTACT",
+    followUs: "NOUS SUIVRE",
+    countryLanguage: "PAYS & LANGUE",
+    tunisia: "Tunisie",
+    english: "Anglais",
+    french: "Français",
+    copyright: "Tous droits réservés.",
+  },
+  orderTracking: {
+    title: "Suivi de Commande",
+    subtitle: "Suivez l'état de votre commande en temps réel",
+    placeholder: "Entrez votre référence de commande",
+    trackButton: "Suivre la Commande",
+    orderRefLabel: "Référence de Commande",
+    statusTitle: "État de la Commande",
+    thankYou: "Merci pour votre patience.",
+    backToShop: "Retour à la Boutique",
+    statuses: {
+      preparing: "Votre commande est en cours de préparation avec le plus grand soin. Notre équipe veille à ce que chaque détail réponde à nos standards de qualité. Merci pour votre patience.",
+      onTheWay: "Votre commande est en route vers vous. Elle a été soigneusement emballée et expédiée. Vous la recevrez sous peu.",
+      delivered: "Votre commande a été livrée avec succès. Nous espérons que vous apprécierez vos nouveaux articles.",
+      notPaid: "Votre commande n'a pas encore été confirmée car le paiement n'a pas été reçu. Veuillez compléter votre paiement pour procéder.",
+      confirmed: "Votre commande a été confirmée et est en cours de traitement. Notre équipe la prépare pour l'expédition.",
+      processing: "Votre commande est en cours de traitement. Notre équipe logistique coordonne les dernières étapes avant l'expédition.",
+    },
+  },
+  productData: {
+    1: {
+      name: "Robe en Satin de Soie",
+      description:
+        "Une robe raffinée en satin de soie à la silhouette fluide, conçue pour une élégance sans effort. Le tissu délicat capte la lumière à chaque mouvement, créant un subtil jeu de brillance et d'ombre.",
+      composition:
+        "100% Satin de Soie. Doublure : 100% Cupro. Boutons : nacre.",
+      fit: "Coupe regular. Le mannequin mesure 178 cm et porte une taille S.",
+      care: [
+        "Nettoyage à sec uniquement",
+        "Ne pas blanchir",
+        "Repasser à basse température",
+        "Ne pas sécher en machine",
+      ],
+    },
+    2: {
+      name: "Sac Coffee Capri",
+      description:
+        "Un sac en cuir artisanal fabriqué en quantité limitée. Le cuir pleine fleur souple développe une patine unique au fil du temps, rendant chaque pièce véritablement unique.",
+      composition:
+        "Extérieur : 100% Cuir de Veau. Doublure : 100% Coton. Métallerie : Laiton finition palladium.",
+      fit: "Dimensions : 28 x 18 x 8 cm. Hauteur anse : 12 cm. Bandoulière ajustable : 100-120 cm.",
+      care: [
+        "Essuyer avec un chiffon doux et sec",
+        "Éviter une exposition prolongée au soleil",
+        "Ranger dans le sac de protection",
+        "Tenir à l'écart de l'eau et des solvants",
+      ],
+    },
+    3: {
+      name: "Maillot de Bain Imprimé",
+      description:
+        "Un maillot de bain une pièce imprimé qui passe harmonieusement de la piscine au beach-club. Le tissu à séchage rapide assure un confort toute la journée sous le soleil.",
+      composition: "80% Polyamide, 20% Élasthanne. Doublure : 100% Polyamide.",
+      fit: "Coupe ajustée. Le mannequin mesure 175 cm et porte une taille S.",
+      care: [
+        "Rincer immédiatement après usage",
+        "Laver à la main à froid",
+        "Ne pas blanchir",
+        "Sécher à l'ombre",
+      ],
+    },
+    4: {
+      name: "Ensemble Soutien-Gorge & Brief Sans Couture",
+      description:
+        "Conçu pour un confort absolu sans compromis sur l'esthétique. La construction sans couture offre une sensation de seconde peau tout en maintenant une silhouette raffinée.",
+      composition:
+        "72% Polyamide, 28% Élasthanne. Fond de gousset : 100% Coton.",
+      fit: "Coupe standard. Conçu pour une sensation légère.",
+      care: [
+        "Laver à la main à froid",
+        "Ne pas blanchir",
+        "Ne pas sécher en machine",
+        "Sécher à plat",
+      ],
+    },
+    5: {
+      name: "Chemisier Carretto",
+      description:
+        "Un chemisier artisanal arborant notre imprimé Carretto signature. Le tissu en popeline légère offre une sensation aérée, parfaite pour les tenues par temps chaud.",
+      composition: "100% Popeline de Coton. Boutons : corozo naturel.",
+      fit: "Coupe relax. Le mannequin mesure 176 cm et porte une taille S.",
+      care: [
+        "Laver en machine à froid à 30°C",
+        "Ne pas blanchir",
+        "Repasser à température moyenne",
+        "Ne pas sécher en machine",
+      ],
+    },
+    6: {
+      name: "Chemise en Lin Italien",
+      description:
+        "Une chemise en lin magistralement confectionnée à partir du plus fin lin italien. Les fibres naturelles offrent une respirabilité exceptionnelle et une texture distinctive qui s'adoucit à chaque lavage.",
+      composition: "100% Lin. Boutons : corozo naturel.",
+      fit: "Coupe regular. Le mannequin mesure 185 cm et porte une taille M.",
+      care: [
+        "Laver en machine à froid",
+        "Ne pas blanchir",
+        "Repasser à température moyenne",
+        "Suspendre pour sécher",
+      ],
+    },
+    7: {
+      name: "Sneakers en Cuir",
+      description:
+        "Une paire de sneakers en cuir élégante fabriquée à la main en Italie. La tige en veau souple épouse le pied au fil du temps, tandis que la semelle en caoutchouc offre un confort toute la journée.",
+      composition:
+        "Dessus : 100% Cuir de Veau. Doublure : 100% Cuir. Semelle : Caoutchouc.",
+      fit: "Coupe standard. Le mannequin mesure 185 cm et chausse du 42.",
+      care: [
+        "Essuyer avec un chiffon humide",
+        "Utiliser un conditionneur pour cuir",
+        "Ranger dans un sac de protection",
+        "Éviter l'eau et la pluie",
+      ],
+    },
+    8: {
+      name: "Ceinture Classique",
+      description:
+        "Une ceinture en cuir intemporelle découpée dans une seule pièce de cuir pleine fleur. La boucle en laiton brossé développe une patine chaleureuse, rendant chaque ceinture unique.",
+      composition:
+        "100% Cuir de Veau. Boucle : Laiton finition brossée.",
+      fit: "Taille unique. Largeur : 3,5 cm. Ajustable de 75 cm à 110 cm.",
+      care: [
+        "Essuyer avec un chiffon doux et sec",
+        "Éviter une exposition prolongée au soleil",
+        "Ranger à plat dans un sac de protection",
+        "Tenir à l'écart de l'eau",
+      ],
+    },
+    9: {
+      name: "Pantalon Tailleur",
+      description:
+        "Un pantalon tailleur expertement confectionné en pure laine avec une chaîne d'approvisionnement traçable. La coupe précise crée une silhouette nette qui passe sans effort du bureau au dîner.",
+      composition:
+        "100% Laine Vierge. Doublure : 100% Cupro. Boutons : corozo.",
+      fit: "Coupe slim. Le mannequin mesure 185 cm et porte une taille 48 (M).",
+      care: [
+        "Nettoyage à sec uniquement",
+        "Ne pas blanchir",
+        "Repasser à basse température",
+        "Suspendre pour aérer",
+      ],
+    },
+    10: {
+      name: "Col Roulé en Cachemire",
+      description:
+        "Un col roulé en cachemire exceptionnellement doux à la coupe relax. Les fils de cachemire pur de Mongolie offrent une chaleur incomparable et une finition halo subtile.",
+      composition: "100% Cachemire de Mongolie.",
+      fit: "Coupe relax. Le mannequin mesure 178 cm et porte une taille S.",
+      care: ["Laver à la main à froid ou nettoyage à sec", "Ne pas blanchir", "Sécher à plat", "Ranger plié"],
+    },
+    11: {
+      name: "Manteau en Mélange de Laine",
+      description:
+        "Un manteau sculptural en mélange de laine aux lignes architecturales épurées. La silhouette structurée est équilibrée par un drapé fluide.",
+      composition: "70% Laine Vierge, 30% Polyamide. Doublure : 100% Cupro.",
+      fit: "Coupe oversize. Le mannequin mesure 178 cm et porte une taille S.",
+      care: ["Nettoyage à sec uniquement", "Ne pas blanchir", "Repasser à basse température", "Ranger sur cintre rembourré"],
+    },
+    12: {
+      name: "Ensemble Pyjama en Soie",
+      description:
+        "Un ensemble pyjama en soie luxueux taillé dans du satin charmeuse 22 momme. L'ensemble deux pièces décontracté passe sans effort du coucher au lounge.",
+      composition: "100% Soie Charmeuse. Boutons : nacre.",
+      fit: "Coupe relax. Le mannequin mesure 175 cm et porte une taille S.",
+      care: ["Laver à la main à froid", "Ne pas blanchir", "Repasser à basse température", "Ne pas sécher en machine"],
+    },
+    13: {
+      name: "Body en Dentelle",
+      description:
+        "Un body en dentelle complexe confectionné en dentelle de Calais française. Les panneaux transparents et le motif floral délicat créent un jeu captivant entre révélation et dissimulation.",
+      composition: "90% Polyamide, 10% Élasthanne. Gousset : 100% Coton.",
+      fit: "Coupe ajustée. Le mannequin mesure 175 cm et porte une taille S.",
+      care: ["Laver à la main à froid", "Utiliser un détergent doux", "Ne pas tordre", "Sécher à plat"],
+    },
+    14: {
+      name: "Sac Bandoulière en Cuir",
+      description:
+        "Un sac bandoulière compact en cuir de veau grainé avec chaîne dorée. La silhouette structurée contient l'essentiel tout en faisant une déclaration raffinée.",
+      composition: "100% Cuir de Veau. Doublure : 100% Suède. Métallerie : Laiton.",
+      fit: "Dimensions : 22 x 15 x 6 cm. Hauteur bandoulière : 55 cm.",
+      care: ["Essuyer avec un chiffon doux et sec", "Éviter la lumière directe du soleil", "Ranger dans un sac de protection", "Tenir à l'écart de l'eau"],
+    },
+    15: {
+      name: "Cardigan en Mérinos",
+      description:
+        "Un cardigan finement tricoté en laine mérinos avec des bordures côtelées et des boutons en corne. Le tissu léger mais chaud en fait une pièce de superposition idéale.",
+      composition: "100% Laine Mérinos. Boutons : corne.",
+      fit: "Coupe regular. Le mannequin mesure 176 cm et porte une taille S.",
+      care: ["Laver à la main à froid", "Ne pas blanchir", "Sécher à plat", "Ranger plié"],
+    },
+    16: {
+      name: "Sweat à Capuche en Coton",
+      description:
+        "Un sweat à capuche en coton biologique épais à la silhouette décontractée. L'intérieur brossé et les poignets côtelés offrent du confort sans compromettre l'esthétique épurée.",
+      composition: "100% Coton Biologique. Côtelures : 95% Coton, 5% Élasthanne.",
+      fit: "Coupe oversize. Le mannequin mesure 185 cm et porte une taille M.",
+      care: ["Laver en machine à froid", "Ne pas blanchir", "Sécher en machine à basse température", "Repasser à température moyenne"],
+    },
+    17: {
+      name: "Pantalon de Sport Technique",
+      description:
+        "Un pantalon de sport haute performance dans un tissu technique léger. La jambe fuselée et les poches zippées combinent fonctionnalité athlétique et style discret.",
+      composition: "100% Polyester Recyclé. Finition déperlante.",
+      fit: "Coupe slim. Le mannequin mesure 185 cm et porte une taille M.",
+      care: ["Laver en machine à froid", "Ne pas blanchir", "Sécher en machine à basse température", "Ne pas repasser"],
+    },
+    18: {
+      name: "Sac Messager en Cuir",
+      description:
+        "Un sac messager raffiné en cuir pleine fleur tanné végétal. Le compartiment principal spacieux accueille un ordinateur tandis que la doublure en toile cirée ajoute de la durabilité.",
+      composition: "Extérieur : 100% Cuir Pleine Fleur. Doublure : 100% Toile Cirée. Métallerie : Laiton.",
+      fit: "Dimensions : 38 x 28 x 10 cm. Bandoulière ajustable : 80-140 cm.",
+      care: ["Essuyer avec un chiffon humide", "Appliquer un conditionneur pour cuir", "Ranger dans un sac de protection", "Tenir à l'écart de l'eau"],
+    },
+    19: {
+      name: "Ensemble Cravate & Pochette en Soie",
+      description:
+        "Un ensemble cravate et pochette assorties en soie raffinée, roulée à la main et confectionnée à Côme, en Italie. Le motif jacquard subtil ajoute de la texture aux tenues formelles.",
+      composition: "100% Soie Jacquard. Doublure : 100% Cupro.",
+      fit: "Taille unique. Largeur cravate : 7 cm. Longueur cravate : 148 cm. Pochette : 28 cm.",
+      care: ["Nettoyage à sec uniquement", "Ne pas blanchir", "Repasser à basse température", "Ranger à plat ou roulé"],
+    },
+    20: {
+      name: "Short en Lin",
+      description:
+        "Un short en lin léger taillé dans une forme ample généreuse. Le tissu respirant et la taille élastiquée les rendent idéaux pour les loisirs par temps chaud.",
+      composition: "100% Lin. Ceinture : 100% Coton. Cordon : 100% Coton.",
+      fit: "Coupe relax. Le mannequin mesure 185 cm et porte une taille M.",
+      care: ["Laver en machine à froid", "Ne pas blanchir", "Repasser à température moyenne", "Suspendre pour sécher"],
+    },
+  },
+};
+
+export default fr;

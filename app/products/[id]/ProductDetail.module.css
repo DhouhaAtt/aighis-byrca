@@ -1,0 +1,55 @@
+.page{
+
+    max-width:var(--max-width);
+
+    margin:0 auto;
+
+    padding:40px 40px 0;
+}
+
+.layout{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:80px;
+
+    margin-top:32px;
+}
+
+@media(max-width:1200px){
+
+    .layout{
+
+        gap:48px;
+    }
+}
+
+@media(max-width:1024px){
+
+    .layout{
+
+        grid-template-columns:1fr;
+
+        gap:40px;
+    }
+
+    .page{
+
+        padding:24px 24px 0;
+    }
+}
+
+@media(max-width:640px){
+
+    .page{
+
+        padding:16px 16px 0;
+    }
+
+    .layout{
+
+        gap:24px;
+    }
+}

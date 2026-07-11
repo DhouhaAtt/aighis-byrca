@@ -1,0 +1,27 @@
+.button{
+
+    flex:1;
+
+    height:52px;
+
+    background:#111;
+
+    color:white;
+
+    border:none;
+
+    font-size:12px;
+
+    letter-spacing:.12em;
+
+    text-transform:uppercase;
+
+    cursor:pointer;
+
+    transition:background .4s;
+}
+
+.button:hover{
+
+    background:#333;
+}

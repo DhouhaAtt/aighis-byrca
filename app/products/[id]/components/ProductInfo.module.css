@@ -1,0 +1,158 @@
+.info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:0;
+
+    position:sticky;
+
+    top:40px;
+
+    align-self:start;
+}
+
+.collection{
+
+    font-size:11px;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+    color:#999;
+
+    margin-bottom:12px;
+}
+
+.title{
+
+    font-family:var(--font-logo);
+
+    font-size:2.4rem;
+
+    font-weight:400;
+
+    line-height:1.2;
+
+    letter-spacing:-.5px;
+
+    color:#111;
+
+    margin-bottom:12px;
+}
+
+.price{
+
+    font-size:1.6rem;
+
+    font-weight:300;
+
+    color:#111;
+
+    margin-bottom:6px;
+}
+
+.category{
+
+    font-size:12px;
+
+    letter-spacing:.06em;
+
+    text-transform:uppercase;
+
+    color:#888;
+
+    margin-bottom:32px;
+}
+
+.actions{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-top:32px;
+
+    margin-bottom:24px;
+}
+
+.wishlistBtn{
+
+    width:52px;
+
+    height:52px;
+
+    border:1px solid #ddd;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:white;
+
+    cursor:pointer;
+
+    transition:border-color .3s, background .3s;
+
+    flex-shrink:0;
+}
+
+.wishlistBtn:hover{
+
+    border-color:#111;
+
+    background:#fafafa;
+}
+
+.meta{
+
+    border-top:1px solid #eee;
+
+    padding-top:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+}
+
+.shipping{
+
+    font-size:13px;
+
+    color:#666;
+
+    line-height:1.5;
+}
+
+.code{
+
+    font-size:11px;
+
+    color:#aaa;
+
+    letter-spacing:.03em;
+}
+
+@media(max-width:1024px){
+
+    .info{
+
+        position:static;
+    }
+
+    .title{
+
+        font-size:2rem;
+    }
+
+    .price{
+
+        font-size:1.4rem;
+    }
+}

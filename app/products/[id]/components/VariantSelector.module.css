@@ -1,0 +1,75 @@
+.selector{
+
+    margin-bottom:24px;
+}
+
+.label{
+
+    font-size:12px;
+
+    letter-spacing:.06em;
+
+    text-transform:uppercase;
+
+    color:#111;
+
+    margin-bottom:12px;
+}
+
+.value{
+
+    font-weight:400;
+
+    color:#666;
+}
+
+.swatches{
+
+    display:flex;
+
+    gap:10px;
+}
+
+.swatch{
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    border:1px solid #ddd;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:white;
+
+    cursor:pointer;
+
+    transition:border-color .3s;
+}
+
+.swatch:hover{
+
+    border-color:#111;
+}
+
+.swatchActive{
+
+    border-color:#111;
+}
+
+.dot{
+
+    width:24px;
+
+    height:24px;
+
+    border-radius:50%;
+
+    display:block;
+}

@@ -1,0 +1,25 @@
+.hero{
+
+position:relative;
+
+height:100vh;
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+overflow:hidden;
+
+background:black;
+
+}
+
+@media(max-width:900px){
+
+.hero{
+
+grid-template-columns:1fr;
+
+}
+
+}

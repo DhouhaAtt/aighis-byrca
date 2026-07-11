@@ -1,0 +1,38 @@
+.breadcrumb{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:11px;
+
+    letter-spacing:.04em;
+
+    text-transform:uppercase;
+
+    color:#999;
+}
+
+.link{
+
+    transition:color .3s;
+}
+
+.link:hover{
+
+    color:#111;
+}
+
+.current{
+
+    color:#555;
+}
+
+.separator{
+
+    margin-left:8px;
+
+    color:#ccc;
+}

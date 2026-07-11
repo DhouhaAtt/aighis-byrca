@@ -1,0 +1,88 @@
+.section{
+
+    margin-top:100px;
+
+    padding-top:60px;
+
+    border-top:1px solid #eee;
+}
+
+.title{
+
+    font-family:var(--font-logo);
+
+    font-size:2rem;
+
+    font-weight:400;
+
+    color:#111;
+
+    margin-bottom:40px;
+
+    letter-spacing:-.3px;
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:28px;
+}
+
+.cardLink{
+
+    text-decoration:none;
+
+    color:inherit;
+}
+
+@media(max-width:1200px){
+
+    .grid{
+
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:900px){
+
+    .grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:20px;
+    }
+
+    .section{
+
+        margin-top:60px;
+
+        padding-top:40px;
+    }
+
+    .title{
+
+        font-size:1.6rem;
+
+        margin-bottom:28px;
+    }
+}
+
+@media(max-width:640px){
+
+    .grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+        gap:10px;
+    }
+
+    .title{
+
+        font-size:1.3rem;
+
+        margin-bottom:20px;
+    }
+}
