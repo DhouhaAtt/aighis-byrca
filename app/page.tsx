@@ -16,6 +16,8 @@ export default function Home() {
       <NewArrivals />
 
       <section style={{ width: "100%", lineHeight: 0 }}>
+
+        
         <Image
           src="/assets/aighis_byrca_woman.png"
           alt=""
