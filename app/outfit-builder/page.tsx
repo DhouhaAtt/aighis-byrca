@@ -88,11 +88,11 @@ export default function OutfitBuilderPage() {
       <Navbar compact />
 
       {/* Simple PageHeader equivalent */}
-      <section className="pageHeader" style={{ background: "#111", color: "white", padding: "140px 40px 50px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-logo)", fontSize: "2.6rem", fontWeight: 400, lineHeight: 1.15 }}>
+      <section className={styles.header}>
+        <h1>
           {showResults ? "Your Curated Outfit" : "Prepare Your Outfit"}
         </h1>
-        <p style={{ marginTop: 8, fontSize: ".9rem", fontWeight: 300, opacity: 0.6, letterSpacing: ".04em" }}>
+        <p>
           {showResults
             ? "A complete look crafted just for you"
             : "Answer a few questions and let us style you"}

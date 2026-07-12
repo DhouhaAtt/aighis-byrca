@@ -7,11 +7,11 @@ export default function TermsPage() {
   return (
     <div className={legalStyles.page}>
       <Navbar compact />
-      <section style={{background:"#111", color:"white", padding:"140px 40px 50px", textAlign:"center"}}>
-        <h1 style={{fontFamily:"var(--font-logo)", fontSize:"2.6rem", fontWeight:400, lineHeight:1.15}}>
+      <section className={legalStyles.header}>
+        <h1>
           Conditions Générales de Vente
         </h1>
-        <p style={{marginTop:8, fontSize:".9rem", fontWeight:300, opacity:.6, letterSpacing:".04em"}}>
+        <p>
           Terms &amp; Conditions of Sale
         </p>
       </section>

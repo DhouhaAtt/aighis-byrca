@@ -66,7 +66,7 @@
 
 :global(.swiper){
 
-    overflow:visible;
+    overflow:hidden;
 }
 
 :global(.swiper-slide){
