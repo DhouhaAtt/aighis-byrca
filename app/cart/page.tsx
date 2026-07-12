@@ -134,7 +134,7 @@ export default function CartPage() {
                 <span>{totalPrice} {t.cart.currency}</span>
               </div>
 
-              <Link href="/checkout" className={styles.checkoutBtn}>{t.cart.checkout}</Link>
+              <Link href="#" className={styles.checkoutBtn}>{t.cart.checkout}</Link>
 
               <Link href="/products" className={styles.continueShopping}>
                 <ArrowLeft size={14} strokeWidth={1.5} />

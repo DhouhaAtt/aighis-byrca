@@ -75,22 +75,22 @@ export default function Footer() {
             <span>+</span>
           </Link>
 
-          <Link href="/order-tracking" className={styles.footerLink}>
+          <Link href="#" className={styles.footerLink}>
             {t.footer.orderTracking}
           </Link>
 
-          <Link href="/returns" className={styles.footerLink}>
+          <Link href="#" className={styles.footerLink}>
             {t.footer.returns}
           </Link>
 
           
 
-          <Link href="/legal" className={styles.footerLink}>
+          <Link href="#" className={styles.footerLink}>
             {t.footer.legalArea}
             <span>+</span>
           </Link>
 
-          <Link href="/contact" className={styles.footerLink}>
+          <Link href="#" className={styles.footerLink}>
             {t.footer.contact}
             <span>+</span>
           </Link>

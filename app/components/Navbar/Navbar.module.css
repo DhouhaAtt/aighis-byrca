@@ -634,3 +634,82 @@ padding:18px 20px;
 }
 
 }
+
+/* ================= MOBILE MENU ================= */
+
+.menuOverlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+z-index:200;
+}
+
+.menuPanel{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+max-width:320px;
+height:100vh;
+background:white;
+z-index:300;
+transform:translateX(-100%);
+transition:transform .4s cubic-bezier(.22,.61,.36,1);
+display:flex;
+flex-direction:column;
+overflow-y:auto;
+}
+
+.menuPanelOpen{
+transform:translateX(0);
+}
+
+.menuPanelHeader{
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #eee;
+padding:20px 24px;
+}
+
+.menuPanelTitle{
+font-family:var(--font-logo);
+font-size:1.6rem;
+font-weight:500;
+letter-spacing:-1px;
+color:#111;
+}
+
+.menuClose{
+background:none;
+border:none;
+cursor:pointer;
+color:#555;
+padding:4px;
+transition:.3s;
+}
+
+.menuClose:hover{
+color:#111;
+}
+
+.menuPanelNav{
+display:flex;
+flex-direction:column;
+padding:16px 0;
+}
+
+.menuPanelLink{
+display:block;
+padding:14px 24px;
+font-size:15px;
+font-weight:300;
+letter-spacing:.04em;
+color:#111;
+text-decoration:none;
+transition:background .25s;
+}
+
+.menuPanelLink:hover{
+background:#f5f5f5;
+}

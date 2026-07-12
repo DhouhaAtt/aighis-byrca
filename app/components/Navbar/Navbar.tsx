@@ -21,6 +21,7 @@ export default function Navbar({ compact = false }: Props) {
   const { totalItems: cartItems } = useCart();
   const { t } = useLocale();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,10 +49,11 @@ export default function Navbar({ compact = false }: Props) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && searchOpen) setSearchOpen(false);
+      if (e.key === "Escape" && menuOpen) setMenuOpen(false);
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [searchOpen]);
+  }, [searchOpen, menuOpen]);
 
   return (
     <header
@@ -125,6 +127,47 @@ export default function Navbar({ compact = false }: Props) {
         )}
       </div>
 
+      {/* MOBILE MENU OVERLAY */}
+      {menuOpen && <div className={styles.menuOverlay} onClick={() => setMenuOpen(false)} />}
+
+      {/* MOBILE MENU PANEL */}
+      <div className={`${styles.menuPanel} ${menuOpen ? styles.menuPanelOpen : ""}`}>
+        <div className={styles.menuPanelHeader}>
+          <span className={styles.menuPanelTitle}>{BRAND_NAME}</span>
+          <button className={styles.menuClose} onClick={() => setMenuOpen(false)}>
+            <X size={20} strokeWidth={1.5} />
+          </button>
+        </div>
+        <nav className={styles.menuPanelNav}>
+          <Link href="/" className={styles.menuPanelLink} onClick={() => setMenuOpen(false)}>
+            {t.nav.home}
+          </Link>
+          {t.nav.top.map((item) => (
+            <Link
+              key={item}
+              href={`/category/${getSlugFromLabel(item)}`}
+              className={styles.menuPanelLink}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item}
+            </Link>
+          ))}
+          {t.nav.center.map((item) => (
+            <Link
+              key={item}
+              href={`/category/${getSlugFromLabel(item)}`}
+              className={styles.menuPanelLink}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item}
+            </Link>
+          ))}
+          <Link href="/wishlist" className={styles.menuPanelLink} onClick={() => setMenuOpen(false)}>
+            {t.nav.wishlist}
+          </Link>
+        </nav>
+      </div>
+
       {/* TOP BAR */}
 
       <div className={styles.topBar}>
@@ -149,7 +192,7 @@ export default function Navbar({ compact = false }: Props) {
             <span>{t.nav.search}</span>
           </button>
 
-          <Link href="/order-tracking" className={styles.textLink}>
+          <Link href="#" className={styles.textLink}>
             {t.footer.orderTracking}
           </Link>
   <Link href="/wishlist" className={styles.wishlistLink}>
@@ -161,7 +204,7 @@ export default function Navbar({ compact = false }: Props) {
               <span className={styles.wishlistCount}>{wishlistItems.length}</span>
             )}
           </Link>
-          <Link href="/cart" className={styles.bag}>
+          <Link href="#" className={styles.bag}>
             <ShoppingBag size={20} strokeWidth={1.6} />
 
             {cartItems > 0 && (
@@ -169,7 +212,7 @@ export default function Navbar({ compact = false }: Props) {
             )}
           </Link>
 
-          <button className={styles.mobile}>
+          <button className={styles.mobile} onClick={() => setMenuOpen(true)}>
             <Menu size={24} />
           </button>
         </div>
