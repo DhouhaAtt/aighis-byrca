@@ -171,20 +171,25 @@ export default function Navbar({ compact = false }: Props) {
       {/* TOP BAR */}
 
       <div className={styles.topBar}>
-        <nav className={styles.leftMenu}>
-          <Link href="/" className={styles.menuItem}>
-            {t.nav.home}
-          </Link>
-          {t.nav.top.map((item) => (
-            <Link
-              key={item}
-              href={`/category/${getSlugFromLabel(item)}`}
-              className={styles.menuItem}
-            >
-              {item}
+        <div className={styles.topBarLeft}>
+          <button className={styles.mobile} onClick={() => setMenuOpen(true)}>
+            <Menu size={24} />
+          </button>
+          <nav className={styles.leftMenu}>
+            <Link href="/" className={styles.menuItem}>
+              {t.nav.home}
             </Link>
-          ))}
-        </nav>
+            {t.nav.top.map((item) => (
+              <Link
+                key={item}
+                href={`/category/${getSlugFromLabel(item)}`}
+                className={styles.menuItem}
+              >
+                {item}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         <div className={styles.rightMenu}>
           <button className={styles.iconLink} onClick={() => setSearchOpen(true)}>
@@ -195,7 +200,7 @@ export default function Navbar({ compact = false }: Props) {
           <Link href="#" className={styles.textLink}>
             {t.footer.orderTracking}
           </Link>
-  <Link href="/wishlist" className={styles.wishlistLink}>
+          <Link href="/wishlist" className={styles.wishlistLink}>
             <Heart size={18} strokeWidth={1.5} />
 
             <span>{t.nav.wishlist}</span>
@@ -211,10 +216,6 @@ export default function Navbar({ compact = false }: Props) {
               <span className={styles.cartCount}>{cartItems}</span>
             )}
           </Link>
-
-          <button className={styles.mobile} onClick={() => setMenuOpen(true)}>
-            <Menu size={24} />
-          </button>
         </div>
       </div>
 

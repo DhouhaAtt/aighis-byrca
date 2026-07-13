@@ -87,6 +87,8 @@
     .gallery{
 
         position:static;
+
+        flex-direction:column;
     }
 
     .thumbs{
@@ -110,5 +112,18 @@
     .main{
 
         order:0;
+
+        aspect-ratio:auto;
+
+        width:100%;
+    }
+
+    .mainImage{
+
+        width:100%;
+
+        height:auto;
+
+        object-fit:contain;
     }
 }
