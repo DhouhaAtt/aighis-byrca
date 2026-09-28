@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Eye, X } from "lucide-react";
+import { Eye, Trash2, X } from "lucide-react";
 import styles from "../AdminTable.module.css";
 
 interface OrderItem {
@@ -24,9 +24,12 @@ interface Order {
   paymentMethod: string;
   totalAmount: string;
   status: string;
+  notes: string | null;
   createdAt: string;
   items: OrderItem[];
 }
+
+const PER_PAGE = 10;
 
 function statusClass(status: string) {
   switch (status) {
@@ -34,6 +37,8 @@ function statusClass(status: string) {
       return styles.statusDelivered;
     case "Shipped":
       return styles.statusShipped;
+    case "Cancelled":
+      return styles.statusCancelled;
     default:
       return styles.statusPending;
   }
@@ -52,12 +57,21 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
+  const [page, setPage] = useState(1);
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
+  const [snackbar, setSnackbar] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const showSnackbar = useCallback((type: "success" | "error", message: string) => {
+    setSnackbar({ type, message });
+    setTimeout(() => setSnackbar(null), 3000);
+  }, []);
 
   useEffect(() => {
     fetch("/api/orders")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error("Failed"); return r.json(); })
       .then((data) => setOrders(data))
-      .catch(() => {})
+      .catch(() => setFetchError("Impossible de charger les commandes"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -72,6 +86,25 @@ export default function AdminOrdersPage() {
     [orders, search]
   );
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE),
+    [filtered, page]
+  );
+
+  useEffect(() => { setPage(1); }, [search]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (cancelTarget) setCancelTarget(null);
+        else if (detailOrder) setDetailOrder(null);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [detailOrder, cancelTarget]);
+
   const updateStatus = useCallback(async (id: number, status: string) => {
     try {
       const res = await fetch(`/api/orders/${id}`, {
@@ -79,15 +112,78 @@ export default function AdminOrdersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        showSnackbar("error", "Y a un problème, impossible de mettre à jour");
+        return;
+      }
       const updated = await res.json();
-      setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
-      setDetailOrder((prev) => (prev?.id === updated.id ? updated : prev));
-    } catch {}
-  }, []);
+      setOrders((prev) => prev.map((o) => (o.id === updated.id ? { ...o, status: updated.status } : o)));
+      if (detailOrder?.id === updated.id) {
+        setDetailOrder((prev) => prev ? { ...prev, status: updated.status } : null);
+      }
+      showSnackbar("success", `Statut mis à jour: ${status}`);
+    } catch {
+      showSnackbar("error", "Y a un problème, impossible de mettre à jour");
+    }
+  }, [showSnackbar, detailOrder]);
+
+  const confirmCancel = useCallback(async () => {
+    if (!cancelTarget) return;
+    try {
+      const res = await fetch(`/api/orders/${cancelTarget.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "Cancelled" }),
+      });
+      if (!res.ok) {
+        showSnackbar("error", "Y a un problème, impossible d'annuler");
+        setCancelTarget(null);
+        return;
+      }
+      setOrders((prev) => {
+        const next = prev.map((o) => (o.id === cancelTarget.id ? { ...o, status: "Cancelled" } : o));
+        const newTotalPages = Math.max(1, Math.ceil(next.length / PER_PAGE));
+        if (page > newTotalPages) setPage(newTotalPages);
+        return next;
+      });
+      showSnackbar("success", "Commande annulée avec succès");
+    } catch {
+      showSnackbar("error", "Y a un problème, impossible d'annuler");
+    }
+    setCancelTarget(null);
+  }, [cancelTarget, showSnackbar, page]);
+
+  function renderPages() {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+      .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+      .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+        if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+        acc.push(p);
+        return acc;
+      }, [])
+      .map((p, i) =>
+        p === "..." ? (
+          <span key={`e${i}`} className={styles.paginationPage} style={{ border: "none", cursor: "default" }}>…</span>
+        ) : (
+          <button
+            key={p}
+            className={`${styles.paginationPage} ${p === page ? styles.paginationPageActive : ""}`}
+            onClick={() => setPage(p)}
+          >
+            {p}
+          </button>
+        )
+      );
+  }
 
   return (
     <div>
+      <div className={styles.countText}>
+        {loading ? "Loading..." : fetchError ? (
+          <div style={{ padding: 40, textAlign: "center", color: "#c62828", fontSize: 13 }}>{fetchError}</div>
+        ) : `${filtered.length} order${filtered.length !== 1 ? "s" : ""} total`}
+      </div>
+
       <div className={styles.toolbar}>
         <input
           type="text"
@@ -118,14 +214,14 @@ export default function AdminOrdersPage() {
                 Loading...
               </td>
             </tr>
-          ) : filtered.length === 0 ? (
+          ) : paginated.length === 0 ? (
             <tr>
               <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>
                 No orders found
               </td>
             </tr>
           ) : (
-            filtered.map((order) => (
+            paginated.map((order) => (
               <tr key={order.id}>
                 <td style={{ fontWeight: 400 }}>{order.orderRef}</td>
                 <td style={{ color: "#888", fontSize: 12 }}>{formatDate(order.createdAt)}</td>
@@ -142,15 +238,35 @@ export default function AdminOrdersPage() {
                   </span>
                 </td>
                 <td>
-                  <button className={styles.actionBtn} onClick={() => setDetailOrder(order)}>
-                    <Eye size={15} strokeWidth={1.5} />
-                  </button>
+                  <div className={styles.actionBtns}>
+                    <button className={styles.actionBtn} onClick={() => setDetailOrder(order)}>
+                      <Eye size={15} strokeWidth={1.5} />
+                    </button>
+                    {order.status !== "Cancelled" && (
+                      <button className={styles.actionBtn} onClick={() => setCancelTarget(order)}>
+                        <Trash2 size={15} strokeWidth={1.5} />
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))
           )}
         </tbody>
       </table>
+
+      {!loading && filtered.length > PER_PAGE && (
+        <div className={styles.pagination}>
+          <span className={styles.paginationInfo}>
+            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+          </span>
+          <div className={styles.paginationBtns}>
+            <button className={styles.paginationBtn} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</button>
+            {renderPages()}
+            <button className={styles.paginationBtn} disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>›</button>
+          </div>
+        </div>
+      )}
 
       {detailOrder && (
         <div className={styles.overlay} onClick={() => setDetailOrder(null)}>
@@ -170,6 +286,9 @@ export default function AdminOrdersPage() {
                 <div><strong>Payment:</strong> {detailOrder.paymentMethod}</div>
                 <div><strong>Total:</strong> {detailOrder.totalAmount}</div>
                 <div><strong>Status:</strong> {detailOrder.status}</div>
+                {detailOrder.notes && (
+                  <div><strong>Notes:</strong> {detailOrder.notes}</div>
+                )}
               </div>
 
               <div style={{ marginTop: 16, fontWeight: 500, fontSize: 13 }}>Items</div>
@@ -199,26 +318,56 @@ export default function AdminOrdersPage() {
                 </tbody>
               </table>
 
-              <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center" }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>Update Status:</span>
-                {["Pending", "Shipped", "Delivered"].map((s) => (
-                  <button
-                    key={s}
-                    className={styles.saveBtn}
-                    style={{
-                      opacity: detailOrder.status === s ? 1 : 0.5,
-                      fontSize: 10,
-                      padding: "6px 14px",
-                      height: "auto",
-                    }}
-                    onClick={() => updateStatus(detailOrder.id, s)}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
+              {detailOrder.status !== "Cancelled" && (
+                <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 13, fontWeight: 500 }}>Update Status:</span>
+                  {["Pending", "Shipped", "Delivered"].map((s) => (
+                    <button
+                      key={s}
+                      className={styles.saveBtn}
+                      style={{
+                        opacity: detailOrder.status === s ? 1 : 0.5,
+                        fontSize: 10,
+                        padding: "6px 14px",
+                        height: "auto",
+                      }}
+                      onClick={() => updateStatus(detailOrder.id, s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+        </div>
+      )}
+
+      {cancelTarget && (
+        <div className={styles.overlay} onClick={() => setCancelTarget(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>Confirmer l'annulation</h3>
+              <button className={styles.modalClose} onClick={() => setCancelTarget(null)}>
+                <X size={18} strokeWidth={1.5} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
+                Voulez-vous vraiment annuler la commande <strong>{cancelTarget.orderRef}</strong> de <strong>{cancelTarget.customerName}</strong> ?
+              </p>
+            </div>
+            <div className={styles.modalFooter} style={{ gap: 12 }}>
+              <button className={styles.cancelBtn} onClick={() => setCancelTarget(null)}>Non, garder</button>
+              <button className={styles.saveBtn} style={{ background: "#c62828" }} onClick={confirmCancel}>Oui, annuler</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {snackbar && (
+        <div className={`${styles.snackbar} ${snackbar.type === "success" ? styles.snackbarSuccess : styles.snackbarError}`}>
+          {snackbar.message}
         </div>
       )}
     </div>

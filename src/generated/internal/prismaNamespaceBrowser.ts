@@ -93,6 +93,7 @@ export const ProductScalarFieldEnum = {
   hoverImage: 'hoverImage',
   gender: 'gender',
   isOnSale: 'isOnSale',
+  stock: 'stock',
   tags: 'tags',
   collection: 'collection',
   description: 'description',
@@ -117,6 +118,10 @@ export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
+  description: 'description',
+  image: 'image',
+  isActive: 'isActive',
+  order: 'order',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -136,6 +141,7 @@ export const OrderScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   status: 'status',
   totalAmount: 'totalAmount',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

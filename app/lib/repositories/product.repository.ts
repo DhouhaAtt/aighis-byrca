@@ -8,6 +8,7 @@ export interface CreateProductInput {
   hoverImage?: string;
   gender?: string;
   isOnSale?: boolean;
+  stock?: number;
   tags?: string;
   collection?: string;
   description?: string;

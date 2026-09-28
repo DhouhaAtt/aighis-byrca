@@ -19,8 +19,13 @@ export async function POST(request: Request) {
     const category = await categoryRepository.create({
       name: body.name,
       slug: body.slug,
+      description: body.description || null,
+      image: body.image || null,
+      isActive: body.isActive ?? true,
+      order: body.order ?? 0,
     });
-    return NextResponse.json(category, { status: 201 });
+    const full = await categoryRepository.findById(category.id);
+    return NextResponse.json(full, { status: 201 });
   } catch {
     return NextResponse.json(
       { error: "Failed to create category" },

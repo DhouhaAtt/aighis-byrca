@@ -3,18 +3,34 @@ import { prisma } from "../prisma";
 export interface CreateCategoryInput {
   name: string;
   slug: string;
+  description?: string;
+  image?: string;
+  isActive?: boolean;
+  order?: number;
 }
 
 export interface UpdateCategoryInput {
   name?: string;
   slug?: string;
+  description?: string;
+  image?: string;
+  isActive?: boolean;
+  order?: number;
 }
 
 export const categoryRepository = {
   async findAll() {
     return prisma.category.findMany({
       include: { _count: { select: { products: true } } },
-      orderBy: { id: "asc" },
+      orderBy: { order: "asc" },
+    });
+  },
+
+  async findActive() {
+    return prisma.category.findMany({
+      where: { isActive: true },
+      include: { _count: { select: { products: true } } },
+      orderBy: { order: "asc" },
     });
   },
 

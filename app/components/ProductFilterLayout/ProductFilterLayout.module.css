@@ -35,7 +35,6 @@
   text-transform: uppercase;
   color: #888;
   padding-bottom: 16px;
-  border-bottom: 1px solid #eee;
   margin-bottom: 8px;
 }
 
@@ -142,14 +141,11 @@
   color: #111;
   letter-spacing: 0.04em;
   margin-bottom: 16px;
-  padding-left: 8px;
-  padding-right: 8px;
 }
 
 .sliderTrack {
   position: relative;
-  width: calc(100% - 16px);
-  padding-left: 28px;
+  width: 100%;
   height: 2px;
   background: #e0e0e0;
   border-radius: 1px;

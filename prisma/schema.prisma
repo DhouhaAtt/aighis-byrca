@@ -18,57 +18,63 @@ model User {
 }
 
 model Product {
-  id             Int      @id @default(autoincrement())
-  name           String
-  price          String
-  originalPrice  String?
-  image          String
-  hoverImage     String?
-  gender         String?
-  isOnSale       Boolean  @default(false)
-  tags           String?
-  collection     String?
-  description    String?
-  composition    String?
-  fit            String?
-  productCode    String?
+  id               Int      @id @default(autoincrement())
+  name             String
+  price            String
+  originalPrice    String?
+  image            String
+  hoverImage       String?
+  gender           String?
+  isOnSale         Boolean  @default(false)
+  stock            Int      @default(0)
+  tags             String?
+  collection       String?
+  description      String?
+  composition      String?
+  fit              String?
+  productCode      String?
   careInstructions String?
-  images         String?
-  colors         String?
-  sizes          String?
-  shipping       String?
-  returns        String?
-  categoryId     Int?
-  category       Category? @relation(fields: [categoryId], references: [id])
-  orderItems     OrderItem[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  images           String?
+  colors           String?
+  sizes            String?
+  shipping         String?
+  returns          String?
+  categoryId       Int?
+  category         Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems       OrderItem[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  slug     String    @unique
-  products Product[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
-  orderRef    String      @unique
+  id            Int         @id @default(autoincrement())
+  orderRef      String      @unique
   customerName  String
   customerEmail String
   customerPhone String
-  address     String
-  city        String
-  postalCode  String
+  address       String
+  city          String
+  postalCode    String
   paymentMethod String
-  status      String      @default("Pending")
-  totalAmount String
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  status        String      @default("Pending")
+  totalAmount   String
+  notes         String?
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model OrderItem {
@@ -76,7 +82,7 @@ model OrderItem {
   orderId      Int
   order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId    Int?
-  product      Product? @relation(fields: [productId], references: [id])
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   productName  String
   productPrice String
   size         String

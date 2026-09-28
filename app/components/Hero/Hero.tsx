@@ -8,7 +8,6 @@ export default function Hero() {
     <section className={styles.hero}>
       <HeroImage image="/assets/bg_hero_1.png" position="right" />
 
-      {/* <HeroCenter /> */}
 
       <HeroImage image="/assets/bg_hero_2.png" position="left" />
     </section>

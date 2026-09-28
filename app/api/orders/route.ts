@@ -33,6 +33,7 @@ export async function POST(request: Request) {
       postalCode: body.postalCode,
       paymentMethod: body.paymentMethod,
       totalAmount: body.totalAmount,
+      notes: body.notes || null,
       items: body.items,
     });
     return NextResponse.json(order, { status: 201 });

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./HeroCenter.module.css";
 
 export default function HeroCenter() {
@@ -14,9 +15,9 @@ export default function HeroCenter() {
       <p>Discover timeless silhouettes crafted for modern luxury.</p>
 
       <div className={styles.actions}>
-        <a href="#">Explore Collection</a>
+        <Link href="/products">Explore Collection</Link>
 
-        <a href="#">Discover More</a>
+        <Link href="/women">Discover More</Link>
       </div>
     </div>
   );

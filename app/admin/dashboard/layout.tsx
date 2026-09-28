@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, Package, ShoppingBag, LogOut, Menu, X, Tags } from "lucide-react";
 import { useAdminAuth } from "../../context/AdminAuthContext";
+import adminStyles from "./AdminTable.module.css";
 import styles from "./AdminLayout.module.css";
 
 const navLinks = [
@@ -23,6 +24,7 @@ export default function AdminDashboardLayout({
   const pathname = usePathname();
   const { isAuthenticated, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,7 +81,7 @@ export default function AdminDashboardLayout({
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <button className={styles.logoutBtn} onClick={handleLogout}>
+          <button className={styles.logoutBtn} onClick={() => setShowLogoutConfirm(true)}>
             <span className={styles.navIcon}>
               <LogOut size={18} strokeWidth={1.5} />
             </span>
@@ -87,6 +89,32 @@ export default function AdminDashboardLayout({
           </button>
         </div>
       </aside>
+
+      {showLogoutConfirm && (
+        <div className={adminStyles.overlay} onClick={() => setShowLogoutConfirm(false)}>
+          <div className={adminStyles.modal} onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
+            <div className={adminStyles.modalHeader}>
+              <h3 className={adminStyles.modalTitle}>Confirmer la déconnexion</h3>
+              <button className={adminStyles.modalClose} onClick={() => setShowLogoutConfirm(false)}>
+                <X size={18} strokeWidth={1.5} />
+              </button>
+            </div>
+            <div className={adminStyles.modalBody}>
+              <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
+                Voulez-vous vraiment vous déconnecter ?
+              </p>
+            </div>
+            <div className={adminStyles.modalFooter} style={{ gap: 12 }}>
+              <button className={adminStyles.cancelBtn} onClick={() => setShowLogoutConfirm(false)}>
+                Annuler
+              </button>
+              <button className={adminStyles.saveBtn} onClick={handleLogout}>
+                Déconnexion
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={styles.main}>
         <header className={styles.topBar}>

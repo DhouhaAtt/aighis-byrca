@@ -18,6 +18,7 @@ export interface CreateOrderInput {
   postalCode: string;
   paymentMethod: string;
   totalAmount: string;
+  notes?: string;
   items?: CreateOrderItemInput[];
 }
 
@@ -62,6 +63,14 @@ export const orderRepository = {
 
   async updateStatus(id: number, status: string) {
     return prisma.order.update({ where: { id }, data: { status } });
+  },
+
+  async findRecent(limit: number) {
+    return prisma.order.findMany({
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
   },
 
   async getStats(): Promise<DashboardStats> {

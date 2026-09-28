@@ -13,7 +13,7 @@ interface DashboardStats {
 }
 
 interface RecentOrder {
-  id: string;
+  orderRef: string;
   customer: string;
   items: number;
   total: string;
@@ -24,10 +24,11 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [orders, setOrders] = useState<RecentOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/stats")
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error("Failed"); return r.json(); })
       .then((data) => {
         setStats({
           totalProducts: data.totalProducts,
@@ -37,7 +38,7 @@ export default function AdminDashboard() {
         });
         setOrders(data.recentOrders || []);
       })
-      .catch(() => {})
+      .catch(() => setFetchError("Impossible de charger le tableau de bord"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -71,6 +72,11 @@ export default function AdminDashboard() {
             Loading...
           </div>
         )}
+        {fetchError && (
+          <div style={{ gridColumn: "1 / -1", padding: 40, textAlign: "center", color: "#c62828", fontSize: 13 }}>
+            {fetchError}
+          </div>
+        )}
       </div>
 
       <div className={styles.section}>
@@ -93,8 +99,8 @@ export default function AdminDashboard() {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
+              <tr key={order.orderRef}>
+                <td>{order.orderRef}</td>
                 <td>{order.customer}</td>
                 <td>{order.items}</td>
                 <td>{order.total}</td>

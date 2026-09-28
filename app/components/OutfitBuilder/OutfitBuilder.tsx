@@ -18,7 +18,7 @@ export default function OutfitBuilder() {
             Tell us your mood, your event, your favorite colors and let us
             craft a complete look that speaks to who you are.
           </p>
-          <Link href="#" className={styles.ctaButton}>
+          <Link href="/outfit-builder" className={styles.ctaButton}>
             <Sparkles size={16} strokeWidth={1.5} />
             Prepare My Outfit
             <ArrowRight size={16} strokeWidth={1.5} />

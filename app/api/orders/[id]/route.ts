@@ -30,8 +30,16 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const order = await orderRepository.updateStatus(Number(id), body.status);
-    return NextResponse.json(order);
+    if (!body.status) {
+      return NextResponse.json({ error: "Status is required" }, { status: 400 });
+    }
+    const existing = await orderRepository.findById(Number(id));
+    if (!existing) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+    await orderRepository.updateStatus(Number(id), body.status);
+    const updated = await orderRepository.findById(Number(id));
+    return NextResponse.json(updated);
   } catch {
     return NextResponse.json(
       { error: "Failed to update order" },

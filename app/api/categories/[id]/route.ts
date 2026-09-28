@@ -30,10 +30,15 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const category = await categoryRepository.update(Number(id), {
+    const updated = await categoryRepository.update(Number(id), {
       name: body.name,
       slug: body.slug,
+      description: body.description ?? undefined,
+      image: body.image ?? undefined,
+      isActive: body.isActive ?? undefined,
+      order: body.order ?? undefined,
     });
+    const category = await categoryRepository.findById(updated.id);
     return NextResponse.json(category);
   } catch {
     return NextResponse.json(
@@ -49,6 +54,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+    const category = await categoryRepository.findById(Number(id));
+    if (!category) {
+      return NextResponse.json({ error: "Category not found" }, { status: 404 });
+    }
     await categoryRepository.delete(Number(id));
     return NextResponse.json({ success: true });
   } catch {

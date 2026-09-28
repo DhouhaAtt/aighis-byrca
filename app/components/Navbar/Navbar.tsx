@@ -197,7 +197,7 @@ export default function Navbar({ compact = false }: Props) {
             <span>{t.nav.search}</span>
           </button>
 
-          <Link href="#" className={styles.textLink}>
+          <Link href="/order-tracking" className={styles.textLink}>
             {t.footer.orderTracking}
           </Link>
           <Link href="/wishlist" className={styles.wishlistLink}>
@@ -209,7 +209,7 @@ export default function Navbar({ compact = false }: Props) {
               <span className={styles.wishlistCount}>{wishlistItems.length}</span>
             )}
           </Link>
-          <Link href="#" className={styles.bag}>
+          <Link href="/cart" className={styles.bag}>
             <ShoppingBag size={20} strokeWidth={1.6} />
 
             {cartItems > 0 && (
