@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import type { Product } from "../components/NewArrivals/products";
-import { toStorefrontProduct, type ProductRow } from "../lib/storefrontProducts";
+import { toStorefrontProduct, type ProductRow } from "../lib/productMapper";
 
 const STORAGE_KEY = "aighis_wishlist_ids";
 

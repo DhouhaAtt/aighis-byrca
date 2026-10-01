@@ -13,7 +13,7 @@ import { useLocale } from "../context/LocaleContext";
 import styles from "./WishlistPage.module.css";
 
 export default function WishlistPage() {
-  const { items } = useWishlist();
+  const { items, loading } = useWishlist();
   const { t } = useLocale();
 
   return (
@@ -30,7 +30,13 @@ export default function WishlistPage() {
       />
 
       <section className={styles.content}>
-        {items.length === 0 ? (
+        {loading ? (
+          <div className={styles.grid}>
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} className={styles.skeleton} />
+            ))}
+          </div>
+        ) : items.length === 0 ? (
           <div className={styles.empty}>
             <Heart size={48} strokeWidth={1} className={styles.emptyIcon} />
 

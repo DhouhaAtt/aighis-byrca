@@ -737,4 +737,86 @@
   .productThumb {
     width: 36px;
   }
+
+  /* Wide admin tables scroll sideways instead of squashing every column. */
+  .tableWrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 720px;
+  }
+
+  .modal {
+    width: calc(100vw - 32px);
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+  }
+
+  .overlay {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .variantTable th,
+  .variantTable td {
+    padding: 8px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .paginationBtns {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .snackbar {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    gap: 10px;
+  }
+
+  .chipGroup {
+    gap: 6px;
+  }
+
+  .chip {
+    min-width: 38px;
+    height: 34px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .saveBtn,
+  .cancelBtn {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .modalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .swatchGrid {
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  }
+
+  .paginationBtn,
+  .paginationPage {
+    height: 32px;
+    min-width: 32px;
+    padding: 0 8px;
+  }
 }

@@ -13,11 +13,31 @@
 
     display:grid;
 
-    grid-template-columns:repeat(4, minmax(260px,1fr));
+    grid-template-columns:repeat(4, minmax(0,1fr));
 
     gap:48px 28px;
 
     align-items:start;
+}
+
+/* LOADING */
+
+.skeleton{
+
+    aspect-ratio:3/4;
+
+    background:linear-gradient(90deg,#f5f5f5 25%,#ebebeb 37%,#f5f5f5 63%);
+
+    background-size:400% 100%;
+
+    animation:shimmer 1.4s ease infinite;
+}
+
+@keyframes shimmer{
+
+    0%{background-position:100% 50%;}
+
+    100%{background-position:0 50%;}
 }
 
 /* EMPTY */

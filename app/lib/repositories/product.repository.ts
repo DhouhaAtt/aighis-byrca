@@ -50,6 +50,21 @@ export const productRepository = {
     });
   },
 
+  /** Public lookup used to rehydrate a customer's saved wishlist. */
+  async findManyByIds(ids: number[]) {
+    if (ids.length === 0) return [];
+
+    const rows = await prisma.product.findMany({
+      where: { id: { in: ids } },
+      include: { category: true },
+    });
+
+    const order = new Map(ids.map((id, index) => [id, index]));
+    return rows.sort(
+      (a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)
+    );
+  },
+
   async create(data: CreateProductInput) {
     return prisma.product.create({ data });
   },
