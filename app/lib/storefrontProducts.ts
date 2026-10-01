@@ -27,10 +27,22 @@ export {
 } from "./productMapper";
 
 import { toStorefrontProduct, type ProductDetailRow, type ProductRow } from "./productMapper";
+import { getFallbackRows } from "./productFallback";
 
+/**
+ * Reads products from the database and falls back to the bundled catalogue if
+ * the database is unavailable, so the storefront always renders.
+ */
 async function fetchRows(): Promise<ProductRow[]> {
-  await connection();
-  return productRepository.findAll();
+  try {
+    await connection();
+    const rows = await productRepository.findAll();
+    if (rows.length > 0) return rows;
+  } catch (error) {
+    console.error("[storefront] database unavailable, using fallback", error);
+  }
+
+  return getFallbackRows();
 }
 
 export async function getAllProducts(): Promise<Product[]> {
@@ -72,8 +84,15 @@ export async function getProductsByCategorySlug(slug: string): Promise<Product[]
 export async function getProductById(
   id: number
 ): Promise<ProductDetailRow | null> {
-  await connection();
-  return productRepository.findById(id);
+  try {
+    await connection();
+    const product = await productRepository.findById(id);
+    if (product) return product;
+  } catch (error) {
+    console.error("[storefront] database unavailable, using fallback", error);
+  }
+
+  return getFallbackRows().find((row) => row.id === id) ?? null;
 }
 
 export async function getRelatedProducts(
@@ -105,13 +124,31 @@ export interface StorefrontCategory {
 export async function getCategoryBySlug(
   slug: string
 ): Promise<StorefrontCategory | null> {
-  await connection();
-  const category = await categoryRepository.findBySlug(slug);
-  if (!category) return null;
-  return {
-    slug: category.slug,
-    name: category.name,
-    description: category.description ?? null,
-    image: category.image ?? null,
-  };
+  try {
+    await connection();
+    const category = await categoryRepository.findBySlug(slug);
+    if (category) {
+      return {
+        slug: category.slug,
+        name: category.name,
+        description: category.description ?? null,
+        image: category.image ?? null,
+      };
+    }
+  } catch (error) {
+    console.error("[storefront] database unavailable, using fallback", error);
+  }
+
+  const match = getFallbackRows().find(
+    (row) => row.category?.slug === slug.toLowerCase()
+  );
+
+  return match?.category
+    ? {
+        slug: match.category.slug,
+        name: match.category.name,
+        description: null,
+        image: null,
+      }
+    : null;
 }

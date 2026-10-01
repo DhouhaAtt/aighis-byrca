@@ -1,6 +1,6 @@
 import "dotenv/config";
 import fs from "node:fs";
-import { PrismaClient } from "../src/generated/client.js";
+import { PrismaClient } from "../src/generated/client";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { createClient } from "@libsql/client";
 import { seedCategories } from "./categoriesData";
