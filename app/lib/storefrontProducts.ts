@@ -32,10 +32,14 @@ import { getFallbackRows } from "./productFallback";
 /**
  * Reads products from the database and falls back to the bundled catalogue if
  * the database is unavailable, so the storefront always renders.
+ *
+ * `connection()` must stay outside the try/catch: it signals to Next that the
+ * route is dynamic, and swallowing that error would freeze the page as static.
  */
 async function fetchRows(): Promise<ProductRow[]> {
+  await connection();
+
   try {
-    await connection();
     const rows = await productRepository.findAll();
     if (rows.length > 0) return rows;
   } catch (error) {
