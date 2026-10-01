@@ -15,6 +15,9 @@ import fr from "../lib/i18n/fr";
 
 const STORAGE_KEY = "aighis_locale";
 
+/** French is the storefront default; English remains selectable. */
+export const DEFAULT_LOCALE: Locale = "fr";
+
 const translations: Record<Locale, Translations> = { en, fr };
 
 interface LocaleContextType {
@@ -26,7 +29,7 @@ interface LocaleContextType {
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {

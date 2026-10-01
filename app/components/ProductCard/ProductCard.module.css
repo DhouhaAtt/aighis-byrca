@@ -45,7 +45,7 @@
 
 .image {
   object-fit: contain;
-  padding: 48px;
+  padding: 20px;
   transition: transform 0.6s ease, opacity 0.45s ease;
 }
 
@@ -204,7 +204,7 @@
 
 @media (max-width: 900px) {
   .image {
-    padding: 36px;
+    padding: 16px;
   }
 }
 
@@ -212,7 +212,7 @@
 
 @media (max-width: 640px) {
   .image {
-    padding: 28px;
+    padding: 10px;
   }
 
   .category {
@@ -243,7 +243,7 @@
 
 @media (max-width: 480px) {
   .image {
-    padding: 22px;
+    padding: 8px;
   }
 
   .info h3 {

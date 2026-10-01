@@ -356,8 +356,7 @@ margin-bottom:16px;
 }
 
 .resultCard img{
-object-fit:contain;
-padding:28px;
+object-fit:cover;
 transition:transform .6s ease;
 }
 
