@@ -47,6 +47,7 @@ async function fetchRows(): Promise<ProductRow[]> {
   }
 
   return getFallbackRows();
+  
 }
 
 export async function getAllProducts(): Promise<Product[]> {
