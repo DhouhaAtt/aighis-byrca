@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { connection, NextRequest, NextResponse } from "next/server";
 
-import { connection } from "next/server";
 import { productRepository } from "../../lib/repositories/product.repository";
 
 const MAX_IDS = 200;
