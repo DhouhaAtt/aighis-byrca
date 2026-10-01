@@ -8,6 +8,7 @@ import styles from "./ProductCard.module.css";
 import type { Product } from "../NewArrivals/products";
 import { useWishlist } from "../../context/WishlistContext";
 import { useLocale } from "../../context/LocaleContext";
+import { discountPercent } from "../../lib/pricing";
 
 interface Props {
   product: Product;
@@ -17,6 +18,8 @@ export default function ProductCard({ product }: Props) {
   const { isLiked, toggleItem } = useWishlist();
   const { t } = useLocale();
   const liked = isLiked(product.id);
+  const discount = discountPercent(product.price, product.originalPrice);
+  const showSale = product.isOnSale && discount !== null;
 
   return (
     <article className={styles.card}>
@@ -69,10 +72,11 @@ export default function ProductCard({ product }: Props) {
         <h3>{product.name}</h3>
 
         <p className={styles.priceRow}>
-          {product.isOnSale && product.originalPrice ? (
+          {showSale ? (
             <>
-              <span className={styles.salePrice}>{product.price}</span>
               <span className={styles.originalPrice}>{product.originalPrice}</span>
+              <span className={styles.salePrice}>{product.price}</span>
+              <span className={styles.discountBadge}>-{discount}%</span>
             </>
           ) : (
             product.price

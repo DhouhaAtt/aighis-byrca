@@ -1,5 +1,3 @@
-import { allProducts } from "../components/NewArrivals/products";
-
 export interface CategoryInfo {
   slug: string;
   titleEn: string;
@@ -123,12 +121,6 @@ export const categoryMap: Record<string, CategoryInfo> = {
     filter: (tags) => tags.includes("lingerie"),
   },
 };
-
-export function getProductsBySlug(slug: string) {
-  const info = categoryMap[slug];
-  if (!info) return [];
-  return allProducts.filter((p) => (p.tags ? info.filter(p.tags) : false));
-}
 
 export function getSlugFromLabel(label: string): string {
   const slugMap: Record<string, string> = {

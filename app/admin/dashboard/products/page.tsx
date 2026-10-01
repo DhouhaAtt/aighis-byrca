@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { Edit3, Trash2, X, Upload } from "lucide-react";
+import { Edit3, Trash2, X, Upload, Check } from "lucide-react";
 import styles from "../AdminTable.module.css";
 
 interface Product {
@@ -14,6 +14,7 @@ interface Product {
   hoverImage: string | null;
   gender: string | null;
   isOnSale: boolean;
+  isNewArrival: boolean;
   stock: number;
   tags: string | null;
   collection: string | null;
@@ -35,6 +36,44 @@ interface Category {
   name: string;
 }
 
+interface ColorOption {
+  name: string;
+  hex: string;
+}
+
+interface VariantRow {
+  id?: number;
+  key: string;
+  size: string;
+  color: string;
+  hex: string | null;
+  stock: number;
+}
+
+const DEFAULT_SIZE = "One Size";
+const DEFAULT_COLOR = "Default";
+
+function variantKey(size: string, color: string): string {
+  return `${size.trim().toLowerCase()}||${color.trim().toLowerCase()}`;
+}
+
+/** Cross product of selected sizes and colors, falling back to One Size/Default. */
+function buildVariantRows(sizes: string[], colors: ColorOption[]): VariantRow[] {
+  const sizeList = sizes.length > 0 ? sizes : [DEFAULT_SIZE];
+  const colorList =
+    colors.length > 0 ? colors : [{ name: DEFAULT_COLOR, hex: "" }];
+
+  return sizeList.flatMap((size) =>
+    colorList.map((color) => ({
+      key: variantKey(size, color.name),
+      size,
+      color: color.name,
+      hex: color.hex || null,
+      stock: 0,
+    }))
+  );
+}
+
 const emptyForm = {
   name: "",
   price: "",
@@ -43,6 +82,7 @@ const emptyForm = {
   hoverImage: "",
   gender: "",
   isOnSale: false,
+  isNewArrival: false,
   stock: 0,
   tags: "",
   collection: "",
@@ -51,15 +91,108 @@ const emptyForm = {
   fit: "",
   productCode: "",
   careInstructions: "",
-  colors: "",
-  sizes: "",
-  shipping: "",
-  returns: "",
+  colors: [] as ColorOption[],
+  sizes: [] as string[],
   categoryId: "",
   extraImages: [] as string[],
 };
 
 const PER_PAGE = 10;
+
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
+
+const COLOR_PALETTE: ColorOption[] = [
+  { name: "Black", hex: "#111111" },
+  { name: "White", hex: "#FFFFFF" },
+  { name: "Ivory", hex: "#F5F0E8" },
+  { name: "Cream", hex: "#EFE3D0" },
+  { name: "Beige", hex: "#D9C7B0" },
+  { name: "Taupe", hex: "#8C7B6B" },
+  { name: "Brown", hex: "#6F4E37" },
+  { name: "Camel", hex: "#B98B5E" },
+  { name: "Grey", hex: "#808080" },
+  { name: "Charcoal", hex: "#3A3A3A" },
+  { name: "Navy", hex: "#1B2A4A" },
+  { name: "Denim", hex: "#4A6FA5" },
+  { name: "Blue", hex: "#2E5EAA" },
+  { name: "Sky", hex: "#A9C9E8" },
+  { name: "Lilac", hex: "#B9A3D9" },
+  { name: "Purple", hex: "#6B4E8C" },
+  { name: "Pink", hex: "#E8A0BF" },
+  { name: "Rose", hex: "#D4698A" },
+  { name: "Red", hex: "#C0392B" },
+  { name: "Burgundy", hex: "#6E1E2E" },
+  { name: "Orange", hex: "#E07A3F" },
+  { name: "Terracotta", hex: "#C4643C" },
+  { name: "Yellow", hex: "#F2C94C" },
+  { name: "Mustard", hex: "#D9A441" },
+  { name: "Olive", hex: "#6B7A4F" },
+  { name: "Green", hex: "#3E6B4F" },
+  { name: "Emerald", hex: "#1F6F54" },
+  { name: "Mint", hex: "#A8D5BA" },
+  { name: "Teal", hex: "#2F6F6B" },
+];
+
+function isLightColor(hex: string): boolean {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return false;
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 165;
+}
+
+function parseSizesValue(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+  } catch {}
+  return value
+    .split(",")
+    .map((size) => size.trim())
+    .filter(Boolean);
+}
+
+function parseColorsValue(value: string | null): ColorOption[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((c): c is ColorOption => Boolean(c) && typeof c === "object" && "hex" in c)
+      .map((c) => ({ name: String(c.name ?? c.hex), hex: String(c.hex) }));
+  } catch {
+    return [];
+  }
+}
+
+function parseCareList(value: string | null): string {
+  if (!value) return "";
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean).join("\n");
+  } catch {}
+  return value;
+}
+
+function toLines(value: string): string[] {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function sortSizes(sizes: string[]): string[] {
+  return [...sizes].sort((a, b) => {
+    const ai = SIZE_OPTIONS.indexOf(a);
+    const bi = SIZE_OPTIONS.indexOf(b);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}
 
 function parseExtraImages(val: string | null): string[] {
   if (!val) return [];
@@ -148,6 +281,8 @@ export default function AdminProductsPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const extraImagesRef = useRef<HTMLInputElement>(null);
   const [extraUploading, setExtraUploading] = useState(false);
+  const [variantStock, setVariantStock] = useState<Record<string, number>>({});
+  const [variantsLoading, setVariantsLoading] = useState(false);
 
   const showSnackbar = useCallback((type: "success" | "error", message: string) => {
     setSnackbar({ type, message });
@@ -201,10 +336,11 @@ export default function AdminProductsPage() {
   const openAdd = useCallback(() => {
     setEditing(null);
     setForm(emptyForm);
+    setVariantStock({});
     setShowModal(true);
   }, []);
 
-  const openEdit = useCallback((product: Product) => {
+  const openEdit = useCallback(async (product: Product) => {
     setEditing(product);
     setForm({
       name: product.name,
@@ -214,6 +350,7 @@ export default function AdminProductsPage() {
       hoverImage: product.hoverImage ?? "",
       gender: product.gender ?? "",
       isOnSale: product.isOnSale,
+      isNewArrival: product.isNewArrival,
       stock: product.stock,
       tags: product.tags ?? "",
       collection: product.collection ?? "",
@@ -221,15 +358,36 @@ export default function AdminProductsPage() {
       composition: product.composition ?? "",
       fit: product.fit ?? "",
       productCode: product.productCode ?? "",
-      careInstructions: product.careInstructions ?? "",
-      colors: product.colors ?? "",
-      sizes: product.sizes ?? "",
-      shipping: product.shipping ?? "",
-      returns: product.returns ?? "",
+      careInstructions: parseCareList(product.careInstructions),
+      colors: parseColorsValue(product.colors),
+      sizes: sortSizes(parseSizesValue(product.sizes)),
       categoryId: product.category?.id ? String(product.category.id) : "",
       extraImages: parseExtraImages(product.images),
     });
+    setVariantStock({});
+    setVariantsLoading(true);
     setShowModal(true);
+
+    try {
+      const res = await fetch(`/api/products/${product.id}`);
+      if (!res.ok) return;
+      const full = await res.json();
+      const variants: { size: string; color: string; stock: number }[] = Array.isArray(
+        full?.variants
+      )
+        ? full.variants
+        : [];
+      if (variants.length === 0) return;
+
+      setVariantStock(
+        Object.fromEntries(
+          variants.map((v) => [variantKey(v.size, v.color), Number(v.stock) || 0])
+        )
+      );
+    } catch {
+    } finally {
+      setVariantsLoading(false);
+    }
   }, []);
 
   const handleExtraUpload = useCallback(async (files: File[]) => {
@@ -257,6 +415,60 @@ export default function AdminProductsPage() {
     if (extraImagesRef.current) extraImagesRef.current.value = "";
   };
 
+  const toggleSize = useCallback((size: string) => {
+    setForm((f) => ({
+      ...f,
+      sizes: f.sizes.includes(size)
+        ? f.sizes.filter((s) => s !== size)
+        : sortSizes([...f.sizes, size]),
+    }));
+  }, []);
+
+  const toggleColor = useCallback((color: ColorOption) => {
+    setForm((f) => ({
+      ...f,
+      colors: f.colors.some((c) => c.hex.toLowerCase() === color.hex.toLowerCase())
+        ? f.colors.filter((c) => c.hex.toLowerCase() !== color.hex.toLowerCase())
+        : [...f.colors, color],
+    }));
+  }, []);
+
+  const allSizes = useMemo(() => {
+    const custom = form.sizes.filter((s) => !SIZE_OPTIONS.includes(s));
+    return [...SIZE_OPTIONS, ...custom];
+  }, [form.sizes]);
+
+  const variantRows = useMemo(
+    () => buildVariantRows(form.sizes, form.colors),
+    [form.sizes, form.colors]
+  );
+
+  const variantTotal = useMemo(
+    () => variantRows.reduce((sum, row) => sum + (variantStock[row.key] ?? 0), 0),
+    [variantRows, variantStock]
+  );
+
+  const setVariantStockValue = useCallback((key: string, value: number) => {
+    setVariantStock((prev) => ({
+      ...prev,
+      [key]: Number.isFinite(value) && value > 0 ? Math.trunc(value) : 0,
+    }));
+  }, []);
+
+  /** Spreads the currently displayed total evenly across every variant. */
+  const distributeTotal = useCallback(() => {
+    const perVariant = Math.floor(variantTotal / variantRows.length);
+    const remainder = variantTotal % variantRows.length;
+    setVariantStock((prev) =>
+      Object.fromEntries(
+        variantRows.map((row, index) => [
+          row.key,
+          perVariant + (index < remainder ? 1 : 0),
+        ])
+      )
+    );
+  }, [variantRows, variantTotal]);
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -268,6 +480,7 @@ export default function AdminProductsPage() {
         hoverImage: form.hoverImage || null,
         gender: form.gender || null,
         isOnSale: form.isOnSale,
+        isNewArrival: form.isNewArrival,
         stock: form.stock,
         tags: form.tags || null,
         collection: form.collection || null,
@@ -275,13 +488,19 @@ export default function AdminProductsPage() {
         composition: form.composition || null,
         fit: form.fit || null,
         productCode: form.productCode || null,
-        careInstructions: form.careInstructions || null,
+        careInstructions: toLines(form.careInstructions).length
+          ? JSON.stringify(toLines(form.careInstructions))
+          : null,
         images: form.extraImages.length ? JSON.stringify(form.extraImages) : null,
-        colors: form.colors || null,
-        sizes: form.sizes || null,
-        shipping: form.shipping || null,
-        returns: form.returns || null,
+        colors: form.colors.length ? JSON.stringify(form.colors) : null,
+        sizes: form.sizes.length ? JSON.stringify(form.sizes) : null,
         categoryId: form.categoryId ? Number(form.categoryId) : null,
+        variants: variantRows.map((row) => ({
+          size: row.size,
+          color: row.color,
+          hex: row.hex,
+          stock: variantStock[row.key] ?? 0,
+        })),
       };
 
       try {
@@ -297,6 +516,7 @@ export default function AdminProductsPage() {
           }
           const updated = await res.json();
           setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+          setForm((f) => ({ ...f, stock: updated.stock ?? 0 }));
           showSnackbar("success", "Produit mis à jour avec succès");
         } else {
           const res = await fetch("/api/products", {
@@ -317,7 +537,7 @@ export default function AdminProductsPage() {
         showSnackbar("error", "Y a un problème, impossible de sauvegarder");
       }
     },
-    [form, editing, showSnackbar]
+    [form, editing, showSnackbar, variantRows, variantStock]
   );
 
   const confirmDelete = useCallback(async () => {
@@ -430,11 +650,16 @@ export default function AdminProductsPage() {
                   <span className={`${styles.badge} ${product.stock > 0 ? styles.badgeActive : styles.badgeSale}`}>{product.stock}</span>
                 </td>
                 <td>
-                  {product.isOnSale ? (
-                    <span className={`${styles.badge} ${styles.badgeSale}`}>Sale</span>
-                  ) : (
-                    <span className={`${styles.badge} ${styles.badgeActive}`}>Active</span>
-                  )}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {product.isOnSale ? (
+                      <span className={`${styles.badge} ${styles.badgeSale}`}>Sale</span>
+                    ) : (
+                      <span className={`${styles.badge} ${styles.badgeActive}`}>Active</span>
+                    )}
+                    {product.isNewArrival && (
+                      <span className={`${styles.badge} ${styles.badgeActive}`}>New Arrival</span>
+                    )}
+                  </div>
                 </td>
                 <td>
                   <div className={styles.actionBtns}>
@@ -560,7 +785,16 @@ export default function AdminProductsPage() {
                   </div>
                   <div className={styles.field}>
                     <label className={styles.label}>Stock</label>
-                    <input className={styles.input} type="number" min="0" value={form.stock} onChange={(e) => setForm((f) => ({ ...f, stock: Number(e.target.value) }))} />
+                    <input
+                      className={styles.input}
+                      type="number"
+                      value={variantTotal}
+                      readOnly
+                      title="Total computed from the per-variant stock below"
+                    />
+                    <span className={styles.hint}>
+                      Automatically summed from the size / colour stock below.
+                    </span>
                   </div>
                 </div>
                 <div className={styles.field}>
@@ -577,7 +811,13 @@ export default function AdminProductsPage() {
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Composition</label>
-                  <input className={styles.input} value={form.composition} onChange={(e) => setForm((f) => ({ ...f, composition: e.target.value }))} placeholder="e.g. 100% Silk" />
+                  <textarea
+                    className={styles.textarea}
+                    rows={3}
+                    value={form.composition}
+                    onChange={(e) => setForm((f) => ({ ...f, composition: e.target.value }))}
+                    placeholder="e.g. 100% Silk. Lining: 100% Viscose. Made in Italy."
+                  />
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Fit</label>
@@ -585,27 +825,175 @@ export default function AdminProductsPage() {
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Sizes</label>
-                  <input className={styles.input} value={form.sizes} onChange={(e) => setForm((f) => ({ ...f, sizes: e.target.value }))} placeholder='JSON: ["XS","S","M","L"]' />
+                  <div className={styles.chipGroup}>
+                    {allSizes.map((size) => {
+                      const active = form.sizes.includes(size);
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          className={`${styles.chip} ${active ? styles.chipActive : ""}`}
+                          onClick={() => toggleSize(size)}
+                          aria-pressed={active}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {form.sizes.length > 0 ? (
+                    <span className={styles.hint}>{form.sizes.length} size{form.sizes.length > 1 ? "s" : ""} selected: {form.sizes.join(", ")}</span>
+                  ) : (
+                    <span className={styles.hint}>No size selected yet.</span>
+                  )}
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Colors</label>
-                  <input className={styles.input} value={form.colors} onChange={(e) => setForm((f) => ({ ...f, colors: e.target.value }))} placeholder='JSON: [{"name":"Black","hex":"#111"}]' />
+                  <div className={styles.swatchGrid}>
+                    {COLOR_PALETTE.map((color) => {
+                      const active = form.colors.some(
+                        (c) => c.hex.toLowerCase() === color.hex.toLowerCase()
+                      );
+                      const checkColor = isLightColor(color.hex) ? "#111" : "#fff";
+                      return (
+                        <button
+                          key={color.hex}
+                          type="button"
+                          className={`${styles.swatch} ${active ? styles.swatchActive : ""}`}
+                          onClick={() => toggleColor(color)}
+                          aria-pressed={active}
+                          title={color.name}
+                        >
+                          <span className={styles.swatchDot} style={{ background: color.hex }}>
+                            {active && (
+                              <Check size={14} strokeWidth={3} style={{ color: checkColor }} />
+                            )}
+                          </span>
+                          <span className={styles.swatchLabel}>{color.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {form.colors.length > 0 && (
+                    <div className={styles.selectedRow}>
+                      {form.colors.map((color) => (
+                        <span key={color.hex} className={styles.selectedTag}>
+                          <span
+                            className={styles.swatchDot}
+                            style={{ background: color.hex, width: 14, height: 14 }}
+                          />
+                          {color.name}
+                          <button
+                            type="button"
+                            className={styles.selectedTagRemove}
+                            onClick={() => toggleColor(color)}
+                            aria-label={`Remove ${color.name}`}
+                          >
+                            <X size={11} strokeWidth={2} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {form.colors.length === 0 && (
+                    <span className={styles.hint}>No color selected yet.</span>
+                  )}
                 </div>
+
                 <div className={styles.field}>
+                  <label className={styles.label}>Stock per size / colour</label>
+                  {variantsLoading ? (
+                    <span className={styles.hint}>Loading current stock…</span>
+                  ) : (
+                    <>
+                      <table className={styles.variantTable}>
+                        <thead>
+                          <tr>
+                            <th>Size</th>
+                            <th>Colour</th>
+                            <th>Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {variantRows.map((row) => (
+                            <tr key={row.key}>
+                              <td>{row.size}</td>
+                              <td>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                                  {row.hex && (
+                                    <span
+                                      className={styles.swatchDot}
+                                      style={{ background: row.hex, width: 12, height: 12 }}
+                                    />
+                                  )}
+                                  {row.color}
+                                </span>
+                              </td>
+                              <td>
+                                <input
+                                  className={styles.input}
+                                  type="number"
+                                  min="0"
+                                  style={{ height: 34, maxWidth: 90 }}
+                                  value={variantStock[row.key] ?? 0}
+                                  onChange={(e) =>
+                                    setVariantStockValue(row.key, Number(e.target.value))
+                                  }
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginTop: 10,
+                        }}
+                      >
+                        <span className={styles.hint}>
+                          {variantRows.length} variant{variantRows.length !== 1 ? "s" : ""} ·{" "}
+                          {variantTotal} unit{variantTotal !== 1 ? "s" : ""} total
+                        </span>
+                        {variantRows.length > 1 && (
+                          <button
+                            type="button"
+                            className={styles.selectedTagRemove}
+                            style={{ fontSize: 11, textDecoration: "underline" }}
+                            onClick={distributeTotal}
+                          >
+                            Split total evenly
+                          </button>
+                        )}
+                      </div>
+                      <span className={styles.hint}>
+                        Customers can only buy what is available for their exact size and colour.
+                      </span>
+                    </>
+                  )}
+                </div>
+                {/* Care instructions: hidden from the form on purpose. The field stays in
+                    form state so existing values are round-tripped untouched; uncomment to
+                    edit them again. */}
+                {/* <div className={styles.field}>
                   <label className={styles.label}>Care Instructions</label>
-                  <input className={styles.input} value={form.careInstructions} onChange={(e) => setForm((f) => ({ ...f, careInstructions: e.target.value }))} placeholder='JSON array' />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Shipping</label>
-                  <textarea className={styles.textarea} rows={3} value={form.shipping} onChange={(e) => setForm((f) => ({ ...f, shipping: e.target.value }))} />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Returns</label>
-                  <textarea className={styles.textarea} rows={3} value={form.returns} onChange={(e) => setForm((f) => ({ ...f, returns: e.target.value }))} />
-                </div>
+                  <textarea
+                    className={styles.textarea}
+                    rows={3}
+                    value={form.careInstructions}
+                    onChange={(e) => setForm((f) => ({ ...f, careInstructions: e.target.value }))}
+                    placeholder="One instruction per line"
+                  />
+                </div> */}
                 <label className={styles.checkboxLabel}>
                   <input type="checkbox" checked={form.isOnSale} onChange={(e) => setForm((f) => ({ ...f, isOnSale: e.target.checked }))} />
                   On Sale
+                </label>
+                <label className={styles.checkboxLabel}>
+                  <input type="checkbox" checked={form.isNewArrival} onChange={(e) => setForm((f) => ({ ...f, isNewArrival: e.target.checked }))} />
+                  Show in New Arrivals (homepage)
                 </label>
               </div>
               <div className={styles.modalFooter} style={{ gap: 12 }}>

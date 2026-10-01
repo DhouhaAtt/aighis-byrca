@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
+import { isAdmin, unauthorized } from "../../lib/requireAdmin";
+
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function POST(request: Request) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];

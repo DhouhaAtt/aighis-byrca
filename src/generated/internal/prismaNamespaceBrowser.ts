@@ -53,9 +53,11 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Product: 'Product',
+  ProductVariant: 'ProductVariant',
   Category: 'Category',
   Order: 'Order',
-  OrderItem: 'OrderItem'
+  OrderItem: 'OrderItem',
+  OrderStatusEvent: 'OrderStatusEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -93,6 +95,7 @@ export const ProductScalarFieldEnum = {
   hoverImage: 'hoverImage',
   gender: 'gender',
   isOnSale: 'isOnSale',
+  isNewArrival: 'isNewArrival',
   stock: 'stock',
   tags: 'tags',
   collection: 'collection',
@@ -112,6 +115,20 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductVariantScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  size: 'size',
+  color: 'color',
+  hex: 'hex',
+  stock: 'stock',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductVariantScalarFieldEnum = (typeof ProductVariantScalarFieldEnum)[keyof typeof ProductVariantScalarFieldEnum]
 
 
 export const CategoryScalarFieldEnum = {
@@ -153,13 +170,27 @@ export const OrderItemScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
   productId: 'productId',
+  variantId: 'variantId',
   productName: 'productName',
   productPrice: 'productPrice',
   size: 'size',
+  color: 'color',
+  hex: 'hex',
   quantity: 'quantity'
 } as const
 
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+export const OrderStatusEventScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  status: 'status',
+  note: 'note',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderStatusEventScalarFieldEnum = (typeof OrderStatusEventScalarFieldEnum)[keyof typeof OrderStatusEventScalarFieldEnum]
 
 
 export const SortOrder = {

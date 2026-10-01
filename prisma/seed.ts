@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { PrismaClient } from "../src/generated/client.js";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { createClient } from "@libsql/client";
+import { seedCategories } from "./categoriesData";
 
 const DB_URL = "file:prisma/dev.db";
 const MIGRATION_SQL = "prisma/migrations/20260709213136_init/migration.sql";
@@ -48,28 +49,7 @@ async function main() {
   });
 
   // Categories
-  const categories = [
-    { name: "Fashion", slug: "fashion", description: "Curated elegance for every moment", image: "/assets/categories/fashion.png", order: 1 },
-    { name: "Sale", slug: "sale", description: "Exclusive promotions on selected pieces", image: "/assets/categories/sale.png", order: 2 },
-    { name: "Casa", slug: "casa", description: "The art of living", image: "/assets/categories/casa.png", order: 3 },
-    { name: "World", slug: "world", description: "A global perspective on style", image: "/assets/categories/world.png", order: 4 },
-    { name: "MY AB", slug: "my-ab", description: "Your exclusive Aighis Byrca experience", image: "/assets/categories/my-ab.png", order: 5 },
-    { name: "Summer Collection", slug: "summer-collection", description: "Lightness for the warm days ahead", image: "/assets/categories/summer-collection.png", order: 6 },
-    { name: "Bags", slug: "bags", description: "Signature Collection", image: "/assets/categories/bags.png", order: 7 },
-    { name: "Gifts", slug: "gifts", description: "Find the perfect present", image: "/assets/categories/gifts.png", order: 8 },
-    { name: "New In", slug: "new-in", description: "The latest additions to our collection", image: "/assets/categories/new-in.png", order: 9 },
-    { name: "Women", slug: "women", description: "Elegance redefined for her", image: "/assets/categories/women.png", order: 10 },
-    { name: "Men", slug: "men", description: "Refined style for him", image: "/assets/categories/men.png", order: 11 },
-    { name: "Collection", slug: "collection", description: "Signature pieces from our latest line", image: "/assets/categories/collection.png", order: 12 },
-    { name: "Sportswear", slug: "sportswear", description: "Performance meets luxury", image: "/assets/categories/sportswear.png", order: 13 },
-    { name: "Lingerie", slug: "lingerie", description: "Intimate elegance", image: "/assets/categories/lingerie.png", order: 14 },
-    { name: "Tops", slug: "tops", description: "Shirts, blouses and more", image: "/assets/categories/tops.png", order: 15 },
-    { name: "Bottoms", slug: "bottoms", description: "Pants, skirts and shorts", image: "/assets/categories/bottoms.png", order: 16 },
-    { name: "Underwear", slug: "underwear", description: "Intimate Collection", image: "/assets/categories/underwear.png", order: 17 },
-    { name: "Online Exclusive", slug: "online-exclusive", description: "Only available online", image: "/assets/categories/online-exclusive.png", order: 18 },
-  ];
-
-  for (const cat of categories) {
+  for (const cat of seedCategories) {
     await prisma.category.upsert({
       where: { slug: cat.slug },
       update: { description: cat.description, image: cat.image, order: cat.order },
@@ -144,35 +124,41 @@ async function main() {
     });
   }
 
-  // Orders
+  // Orders: a single demo order so the admin dashboard has something to show.
+  // Real orders are created through POST /api/orders.
   const orders = [
-    { id: 1, orderRef: "AB-1001", customerName: "Sarah Johnson", customerEmail: "sarah@example.com", customerPhone: "+216 50 123 456", address: "12 Rue de la Liberté", city: "Tunis", postalCode: "1000", paymentMethod: "D17", status: "Delivered", totalAmount: "420 Tnd" },
-    { id: 2, orderRef: "AB-1002", customerName: "Ahmed Ben Ali", customerEmail: "ahmed@example.com", customerPhone: "+216 20 789 012", address: "5 Avenue Habib Bourguiba", city: "Sfax", postalCode: "3000", paymentMethod: "Bank Transfer", status: "Shipped", totalAmount: "120 Tnd" },
-    { id: 3, orderRef: "AB-1003", customerName: "Maria Trabelsi", customerEmail: "maria@example.com", customerPhone: "+216 22 345 678", address: "8 Rue Mongi Slim", city: "Sousse", postalCode: "4000", paymentMethod: "Cash on Delivery", status: "Pending", totalAmount: "280 Tnd" },
-    { id: 4, orderRef: "AB-1004", customerName: "Omar Meftah", customerEmail: "omar@example.com", customerPhone: "+216 98 765 432", address: "3 Rue Ibn Sina", city: "Tunis", postalCode: "1002", paymentMethod: "D17", status: "Pending", totalAmount: "650 Tnd" },
-    { id: 5, orderRef: "AB-1005", customerName: "Leila Bouazizi", customerEmail: "leila@example.com", customerPhone: "+216 55 111 222", address: "15 Rue des Jardins", city: "Nabeul", postalCode: "8000", paymentMethod: "Cash on Delivery", status: "Delivered", totalAmount: "85 Tnd" },
-    { id: 6, orderRef: "AB-1006", customerName: "Youssef Cherni", customerEmail: "youssef@example.com", customerPhone: "+216 71 333 444", address: "22 Avenue de la République", city: "Tunis", postalCode: "1001", paymentMethod: "D17", status: "Shipped", totalAmount: "510 Tnd", notes: "Please leave the package at the reception desk." },
-    { id: 7, orderRef: "AB-1007", customerName: "Amira Bouchama", customerEmail: "amira@example.com", customerPhone: "+216 99 555 666", address: "10 Rue Habib Bourguiba", city: "Sousse", postalCode: "4000", paymentMethod: "Cash on Delivery", status: "Pending", totalAmount: "460 Tnd", notes: "Gift wrapping please, it's a birthday present." },
+    { orderRef: "AB-1007", customerName: "Amira Bouchama", customerEmail: "amira@example.com", customerPhone: "+216 99 555 666", address: "10 Rue Habib Bourguiba", city: "Sousse", postalCode: "4000", paymentMethod: "Cash on Delivery", status: "Pending", totalAmount: "460 Tnd", notes: "Gift wrapping please, it's a birthday present." },
   ];
 
   for (const order of orders) {
     await prisma.order.upsert({
       where: { orderRef: order.orderRef },
       update: {},
-      create: order,
+      create: {
+        ...order,
+        events: { create: { status: order.status, note: "Order placed" } },
+      },
     });
   }
 
-  // Order Items for orders 6 and 7
-  const orderItems = [
-    { orderId: 6, productId: 6, productName: "Tailored Blazer", productPrice: "280 Tnd", size: "M", quantity: 1 },
-    { orderId: 6, productId: 12, productName: "Classic Belt", productPrice: "85 Tnd", size: "One Size", quantity: 1 },
-    { orderId: 6, productId: 22, productName: "Linen Shorts", productPrice: "95 Tnd", size: "L", quantity: 1 },
-    { orderId: 7, productId: 1, productName: "Silk Satin Dress", productPrice: "70 Tnd", size: "S", quantity: 1 },
-    { orderId: 7, productId: 2, productName: "Coffee Capri Bag", productPrice: "140 Tnd", size: "One Size", quantity: 1 },
-    { orderId: 7, productId: 17, productName: "Lace Bodysuit", productPrice: "90 Tnd", size: "M", quantity: 1 },
-    { orderId: 7, productId: 16, productName: "Silk Pajama Set", productPrice: "160 Tnd", size: "S", quantity: 1 },
-  ];
+  // Drop any leftover demo orders from previous seeds.
+  await prisma.order.deleteMany({
+    where: { orderRef: { notIn: orders.map((order) => order.orderRef) } },
+  });
+
+  // Order Items for the demo order
+  const demoOrder = await prisma.order.findUnique({
+    where: { orderRef: "AB-1007" },
+  });
+
+  const orderItems = demoOrder
+    ? [
+        { orderId: demoOrder.id, productId: 1, productName: "Silk Satin Dress", productPrice: "70 Tnd", size: "S", quantity: 1 },
+        { orderId: demoOrder.id, productId: 2, productName: "Coffee Capri Bag", productPrice: "140 Tnd", size: "One Size", quantity: 1 },
+        { orderId: demoOrder.id, productId: 17, productName: "Lace Bodysuit", productPrice: "90 Tnd", size: "M", quantity: 1 },
+        { orderId: demoOrder.id, productId: 16, productName: "Silk Pajama Set", productPrice: "160 Tnd", size: "S", quantity: 1 },
+      ]
+    : [];
 
   for (const item of orderItems) {
     const existing = await prisma.orderItem.findFirst({

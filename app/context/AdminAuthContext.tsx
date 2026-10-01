@@ -11,41 +11,71 @@ import {
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
+  isChecking: boolean;
+  login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>;
+  logout: () => Promise<void>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | null>(null);
 
-const ADMIN_EMAIL = "amore@aighis.com";
-const ADMIN_PASSWORD = "doukhaameur";
-
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("admin_auth");
-    if (stored === "true") {
+    let cancelled = false;
+
+    fetch("/api/auth/session")
+      .then((res) => {
+        if (cancelled) return;
+        setIsAuthenticated(res.ok);
+      })
+      .catch(() => {
+        if (!cancelled) setIsAuthenticated(false);
+      })
+      .finally(() => {
+        if (!cancelled) setIsChecking(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        return { ok: false, error: data?.error ?? "Invalid email or password" };
+      }
+
       setIsAuthenticated(true);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: "Unable to reach the server" };
     }
   }, []);
 
-  const login = useCallback((email: string, password: string) => {
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("admin_auth", "true");
-      setIsAuthenticated(true);
-      return true;
+  const logout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // The cookie is cleared regardless once the request lands; keep the UI signed out.
     }
-    return false;
-  }, []);
-
-  const logout = useCallback(() => {
-    sessionStorage.removeItem("admin_auth");
     setIsAuthenticated(false);
   }, []);
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AdminAuthContext.Provider
+      value={{ isAuthenticated, isChecking, login, logout }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );

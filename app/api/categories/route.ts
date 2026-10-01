@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { categoryRepository } from "../../lib/repositories/category.repository";
+import { isAdmin, unauthorized } from "../../lib/requireAdmin";
 
 export async function GET() {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const categories = await categoryRepository.findAll();
     return NextResponse.json(categories);
@@ -14,6 +16,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const body = await request.json();
     const category = await categoryRepository.create({

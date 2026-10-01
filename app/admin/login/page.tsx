@@ -12,6 +12,7 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -20,7 +21,7 @@ export default function AdminLoginPage() {
   }, [isAuthenticated, router]);
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       setError("");
 
@@ -29,11 +30,14 @@ export default function AdminLoginPage() {
         return;
       }
 
-      const success = login(email, password);
-      if (success) {
+      setSubmitting(true);
+      const result = await login(email, password);
+      setSubmitting(false);
+
+      if (result.ok) {
         router.replace("/admin/dashboard");
       } else {
-        setError("Invalid email or password");
+        setError(result.error ?? "Invalid email or password");
       }
     },
     [email, password, login, router]
@@ -69,8 +73,8 @@ export default function AdminLoginPage() {
 
           {error && <p className={styles.error}>{error}</p>}
 
-          <button type="submit" className={styles.submitBtn}>
-            Sign In
+          <button type="submit" className={styles.submitBtn} disabled={submitting}>
+            {submitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 

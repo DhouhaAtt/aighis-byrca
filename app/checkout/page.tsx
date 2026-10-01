@@ -22,9 +22,13 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState<PaymentMethod>("onDelivery");
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [orderRef, setOrderRef] = useState("");
+  const [confirmedTotal, setConfirmedTotal] = useState("");
+  const [formError, setFormError] = useState("");
 
   const [form, setForm] = useState({
     fullName: "",
+    email: "",
     address: "",
     city: "",
     postalCode: "",
@@ -42,6 +46,7 @@ export default function CheckoutPage() {
     async (e: React.FormEvent) => {
       e.preventDefault();
       setProcessing(true);
+      setFormError("");
 
       try {
         const paymentMap: Record<string, string> = {
@@ -55,33 +60,39 @@ export default function CheckoutPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             customerName: form.fullName,
-            customerEmail: "",
+            customerEmail: form.email,
             customerPhone: form.phone,
             address: form.address,
             city: form.city,
             postalCode: form.postalCode,
             paymentMethod: paymentMap[payment],
-            totalAmount: `${totalPrice} Tnd`,
             items: items.map((item) => ({
               productId: item.id,
-              productName: item.name,
-              productPrice: item.price,
               size: item.size,
+              color: item.color,
               quantity: item.quantity,
             })),
           }),
         });
 
-        if (!res.ok) throw new Error("Failed to create order");
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          setFormError(data?.error ?? "Something went wrong. Please try again.");
+          return;
+        }
+
+        setOrderRef(data?.orderRef ?? "");
+        setConfirmedTotal(data?.totalAmount ?? "");
         setSuccess(true);
         clearCart();
       } catch {
-        alert("Something went wrong. Please try again.");
+        setFormError("Something went wrong. Please try again.");
       } finally {
         setProcessing(false);
       }
     },
-    [form, payment, totalPrice, items, clearCart]
+    [form, payment, items, clearCart]
   );
 
   if (success) {
@@ -93,6 +104,12 @@ export default function CheckoutPage() {
             <CheckCircle size={56} strokeWidth={1.2} className={styles.successIcon} />
             <h1 className={styles.successTitle}>{t.checkout.success}</h1>
             <p className={styles.successMessage}>{t.checkout.successMessage}</p>
+            {orderRef && (
+              <p className={styles.successMessage}>
+                Order reference: <strong>{orderRef}</strong>
+                {confirmedTotal ? ` — Total: ${confirmedTotal}` : ""}
+              </p>
+            )}
             <Link href="/" className={styles.successBtn}>
               {t.checkout.backToShop}
             </Link>
@@ -138,6 +155,16 @@ export default function CheckoutPage() {
                     className={styles.input}
                     value={form.fullName}
                     onChange={(e) => updateField("fullName", e.target.value)}
+                    required
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>{t.checkout.email}</label>
+                  <input
+                    className={styles.input}
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => updateField("email", e.target.value)}
                     required
                   />
                 </div>
@@ -241,7 +268,7 @@ export default function CheckoutPage() {
 
             <div className={styles.summaryItems}>
               {items.map((item) => (
-                <div key={item.id} className={styles.summaryItem}>
+                <div key={item.lineId} className={styles.summaryItem}>
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -251,9 +278,10 @@ export default function CheckoutPage() {
                   />
                   <div className={styles.summaryItemInfo}>
                     <div className={styles.summaryItemName}>{item.name}</div>
-                    <div className={styles.summaryItemDetail}>
-                      {t.cart.size}: {item.size} &middot; {t.cart.item}: {item.quantity}
-                    </div>
+                  <div className={styles.summaryItemDetail}>
+                    {t.cart.size}: {item.size}
+                    {item.color ? ` · ${item.color}` : ""} &middot; {t.cart.item}: {item.quantity}
+                  </div>
                   </div>
                   <div className={styles.summaryItemPrice}>{item.price}</div>
                 </div>
@@ -284,6 +312,22 @@ export default function CheckoutPage() {
             >
               {processing ? t.checkout.processing : t.checkout.placeOrder}
             </button>
+
+            {formError && (
+              <p
+                role="alert"
+                style={{
+                  margin: 0,
+                  padding: "10px 12px",
+                  background: "#fdecea",
+                  color: "#c62828",
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                }}
+              >
+                {formError}
+              </p>
+            )}
 
             <Link href="/cart" className={styles.backLink}>
               <ArrowLeft size={14} strokeWidth={1.5} />

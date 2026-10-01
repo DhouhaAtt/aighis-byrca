@@ -118,10 +118,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 56px;
+  padding-top: 48px;
+  border-top: 1px solid #eee;
 }
 
 .resultHeader {
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .refBadge {
@@ -153,7 +156,7 @@
   width: 100%;
   background: #fafafa;
   border-radius: 2px;
-  padding: 64px 56px;
+  padding: 48px 40px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -161,24 +164,24 @@
 }
 
 .statusIcon {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   opacity: 0.85;
 }
 
 .statusTitle {
   font-family: var(--font-logo);
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.15;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .statusDivider {
   width: 40px;
   height: 1px;
   background: #d0d0d0;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .statusText {
@@ -187,7 +190,131 @@
   line-height: 1.9;
   color: #555;
   max-width: 440px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+}
+
+.metaGrid {
+  width: 100%;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 16px;
+  text-align: left;
+}
+
+.metaGrid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.metaLabel {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+}
+
+.metaValue {
+  font-size: 13px;
+  color: #333;
+  word-break: break-word;
+}
+
+/* ================= PANELS ================= */
+
+.panel {
+  width: 100%;
+  margin-top: 32px;
+  background: #fafafa;
+  border-radius: 2px;
+  padding: 28px 32px;
+}
+
+.panelTitle {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 18px;
+}
+
+.itemList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.itemRow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.itemName {
+  font-size: 13px;
+  color: #111;
+}
+
+.itemMeta {
+  font-size: 11px;
+  color: #888;
+  letter-spacing: 0.03em;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timelineItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.timelineDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #111;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.timelineItem > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.timelineStatus {
+  font-size: 13px;
+  color: #111;
+}
+
+.timelineDate {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 0.03em;
 }
 
 .thankYou {
@@ -265,15 +392,15 @@
   }
 
   .formCard {
-    padding: 36px 24px;
+    padding: 32px 22px;
   }
 
   .statusCard {
-    padding: 48px 28px;
+    padding: 36px 22px;
   }
 
   .statusTitle {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .statusText {
@@ -283,18 +410,65 @@
   .refValue {
     font-size: 1.3rem;
   }
+
+  .result {
+    margin-top: 40px;
+    padding-top: 32px;
+  }
+
+  .resultHeader {
+    margin-bottom: 28px;
+  }
+
+  .metaGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+
+  .panel {
+    margin-top: 20px;
+    padding: 22px 18px;
+  }
+
+  .actions {
+    margin-top: 32px;
+  }
 }
 
 @media (max-width: 480px) {
+  .content {
+    padding: 36px 16px 60px;
+  }
+
   .formCard {
-    padding: 32px 20px;
+    padding: 26px 16px;
   }
 
   .statusCard {
-    padding: 40px 20px;
+    padding: 30px 16px;
+  }
+
+  .input {
+    padding: 14px 16px;
+    font-size: 14px;
   }
 
   .submit {
-    padding: 15px 28px;
+    padding: 15px 20px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+
+  .trackAnother {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+
+  .metaValue {
+    font-size: 12px;
   }
 }

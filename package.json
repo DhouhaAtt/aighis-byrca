@@ -8,6 +8,8 @@
     "start": "next start",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:storefront": "tsx prisma/seed-storefront.ts",
+    "db:seed:variants": "tsx prisma/seed-variants.ts",
     "db:reset": "prisma migrate reset --force"
   },
   "prisma": {

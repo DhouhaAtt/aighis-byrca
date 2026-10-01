@@ -9,7 +9,9 @@ export default function Hero() {
       <HeroImage image="/assets/bg_hero_1.png" position="right" />
 
 
-      <HeroImage image="/assets/bg_hero_2.png" position="left" />
+      {/* <HeroImage image="/assets/bg_hero_2.png" position="left" />
+       */}
+        <HeroImage image="/assets/manleft.jpeg" position="left" />
     </section>
   );
 }

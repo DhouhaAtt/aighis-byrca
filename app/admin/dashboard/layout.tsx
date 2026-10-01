@@ -22,18 +22,18 @@ export default function AdminDashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, logout } = useAdminAuth();
+  const { isAuthenticated, isChecking, logout } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isChecking && !isAuthenticated) {
       router.replace("/admin/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isChecking, router]);
 
-  const handleLogout = useCallback(() => {
-    logout();
+  const handleLogout = useCallback(async () => {
+    await logout();
     router.replace("/admin/login");
   }, [logout, router]);
 
@@ -45,6 +45,7 @@ export default function AdminDashboardLayout({
     return "Dashboard";
   }, [pathname]);
 
+  if (isChecking) return null;
   if (!isAuthenticated) return null;
 
   return (

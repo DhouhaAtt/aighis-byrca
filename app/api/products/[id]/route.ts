@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { productRepository } from "../../../lib/repositories/product.repository";
+import { isAdmin, unauthorized } from "../../../lib/requireAdmin";
+import { variantRepository } from "../../../lib/repositories/variant.repository";
+import { toVariantInputs } from "../../../lib/productPayload";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const product = await productRepository.findById(Number(id));
@@ -27,6 +31,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -42,7 +47,7 @@ export async function PUT(
       hoverImage: body.hoverImage ?? existing.hoverImage,
       gender: body.gender ?? existing.gender,
       isOnSale: body.isOnSale ?? existing.isOnSale,
-      stock: body.stock ?? existing.stock,
+      isNewArrival: body.isNewArrival ?? existing.isNewArrival,
       tags: body.tags ?? existing.tags,
       collection: body.collection ?? existing.collection,
       description: body.description ?? existing.description,
@@ -57,6 +62,12 @@ export async function PUT(
       returns: body.returns ?? existing.returns,
       categoryId: body.categoryId !== undefined ? body.categoryId : existing.categoryId,
     });
+
+    const variants = toVariantInputs(body);
+    if (variants) {
+      await variantRepository.sync(updated.id, variants);
+    }
+
     const full = await productRepository.findById(updated.id);
     return NextResponse.json(full);
   } catch {
@@ -71,6 +82,7 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const existing = await productRepository.findById(Number(id));

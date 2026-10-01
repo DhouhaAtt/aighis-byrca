@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { orderRepository } from "../../lib/repositories/order.repository";
+import { isAdmin, unauthorized } from "../../lib/requireAdmin";
 
 export async function GET() {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const [stats, recentOrders] = await Promise.all([
       orderRepository.getStats(),

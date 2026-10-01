@@ -7,13 +7,16 @@ import GenderSection from "./components/GenderSection/GenderSection";
 import CategoriesSection from "./components/CategoriesSection/CategoriesSection";
 import AboutSection from "./components/AboutSection/AboutSection";
 import OutfitBuilder from "./components/OutfitBuilder/OutfitBuilder";
+import { getNewArrivals } from "./lib/storefrontProducts";
 
-export default function Home() {
+export default async function Home() {
+  const newArrivals = await getNewArrivals();
+
   return (
     <>
       <Navbar />
       <Hero />
-      <NewArrivals />
+      <NewArrivals products={newArrivals} />
 
       <section style={{ width: "100%", lineHeight: 0 }}>
 

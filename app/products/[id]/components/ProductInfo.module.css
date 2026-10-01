@@ -54,6 +54,43 @@
     margin-bottom:6px;
 }
 
+.priceRow{
+
+    display:flex;
+
+    align-items:baseline;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-bottom:6px;
+}
+
+.originalPrice{
+
+    font-size:1.1rem;
+
+    font-weight:300;
+
+    color:#999;
+
+    text-decoration:line-through;
+}
+
+.discountBadge{
+
+    font-size:10px;
+
+    letter-spacing:.08em;
+
+    color:#c00;
+
+    background:#fdecea;
+
+    padding:3px 7px;
+}
+
 .category{
 
     font-size:12px;

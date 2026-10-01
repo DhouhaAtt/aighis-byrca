@@ -67,14 +67,17 @@ export default function CartPage() {
                       {item.name}
                     </Link>
 
-                    <p className={styles.itemSize}>{t.cart.size}: {item.size}</p>
+                    <p className={styles.itemSize}>
+                      {t.cart.size}: {item.size}
+                      {item.color ? ` · ${item.color}` : ""}
+                    </p>
 
                     <p className={styles.itemPrice}>{item.price}</p>
 
                     <div className={styles.quantity}>
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
+                          updateQuantity(item.lineId, item.quantity - 1)
                         }
                         className={styles.qtyBtn}
                         disabled={item.quantity <= 1}
@@ -88,7 +91,7 @@ export default function CartPage() {
 
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
+                          updateQuantity(item.lineId, item.quantity + 1)
                         }
                         className={styles.qtyBtn}
                       >
@@ -103,7 +106,7 @@ export default function CartPage() {
                     </p>
 
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.lineId)}
                       className={styles.removeBtn}
                       aria-label={t.cart.removeItem}
                     >

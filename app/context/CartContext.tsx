@@ -10,17 +10,25 @@ import {
 } from "react";
 
 import type { Product } from "../components/NewArrivals/products";
+import { parseAmount } from "../lib/pricing";
 
 const STORAGE_KEY = "aighis_cart";
 const EXPIRY_MS = 24 * 60 * 60 * 1000;
 
 export interface CartItem {
   id: number;
+  lineId: string;
   name: string;
   price: string;
   image: string;
   size: string;
+  color: string | null;
+  hex: string | null;
   quantity: number;
+}
+
+export function buildLineId(id: number, size: string, color: string | null): string {
+  return `${id}::${size}::${color ?? ""}`;
 }
 
 interface StoredData {
@@ -43,7 +51,12 @@ function readStorage(): CartItem[] {
       return [];
     }
 
-    return data.items;
+    return data.items.map((item) => ({
+      ...item,
+      color: item.color ?? null,
+      hex: item.hex ?? null,
+      lineId: item.lineId ?? buildLineId(item.id, item.size, item.color ?? null),
+    }));
   } catch {
     return [];
   }
@@ -60,9 +73,9 @@ function writeStorage(items: CartItem[]) {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, size?: string) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  addItem: (product: Product, size?: string, color?: string | null, hex?: string | null) => void;
+  removeItem: (lineId: string) => void;
+  updateQuantity: (lineId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: string;
@@ -71,7 +84,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 function formatPrice(price: string): number {
-  return Number(price.replace(/[^0-9.]/g, ""));
+  return parseAmount(price) ?? 0;
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -87,45 +100,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (hydrated) writeStorage(items);
   }, [items, hydrated]);
 
-  const addItem = useCallback((product: Product, size = "One Size") => {
-    setItems((prev) => {
-      const existing = prev.find(
-        (item) => item.id === product.id
-      );
+  const addItem = useCallback(
+    (product: Product, size = "One Size", color: string | null = null, hex: string | null = null) => {
+      const lineId = buildLineId(product.id, size, color);
 
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
+      setItems((prev) => {
+        const existing = prev.find((item) => item.lineId === lineId);
 
-      return [
-        ...prev,
-        {
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          size,
-          quantity: 1,
-        },
-      ];
-    });
+        if (existing) {
+          return prev.map((item) =>
+            item.lineId === lineId
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        }
+
+        return [
+          ...prev,
+          {
+            id: product.id,
+            lineId,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            size,
+            color,
+            hex,
+            quantity: 1,
+          },
+        ];
+      });
+    },
+    []
+  );
+
+  const removeItem = useCallback((lineId: string) => {
+    setItems((prev) => prev.filter((item) => item.lineId !== lineId));
   }, []);
 
-  const removeItem = useCallback((id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }, []);
-
-  const updateQuantity = useCallback((id: number, quantity: number) => {
+  const updateQuantity = useCallback((lineId: string, quantity: number) => {
     if (quantity < 1) return;
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      prev.map((item) => (item.lineId === lineId ? { ...item, quantity } : item))
     );
   }, []);
 

@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { categoryRepository } from "../../../lib/repositories/category.repository";
+import { isAdmin, unauthorized } from "../../../lib/requireAdmin";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const category = await categoryRepository.findById(Number(id));
@@ -27,6 +29,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const body = await request.json();
@@ -52,6 +55,7 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!(await isAdmin())) return unauthorized();
   try {
     const { id } = await params;
     const category = await categoryRepository.findById(Number(id));

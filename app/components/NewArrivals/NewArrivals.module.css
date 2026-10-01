@@ -37,3 +37,11 @@
     max-width:1800px;
     margin:auto;
 }
+
+.empty {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 60px 20px;
+}

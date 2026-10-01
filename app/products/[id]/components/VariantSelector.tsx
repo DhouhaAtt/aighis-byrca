@@ -23,7 +23,8 @@ export default function VariantSelector({
   return (
     <div className={styles.selector}>
       <p className={styles.label}>
-        {label}: <span className={styles.value}>{selected.name}</span>
+        {label}:{" "}
+        <span className={styles.value}>{selected?.name ?? "-"}</span>
       </p>
 
       <div className={styles.swatches}>

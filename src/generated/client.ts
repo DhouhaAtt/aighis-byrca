@@ -52,6 +52,11 @@ export type User = Prisma.UserModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model ProductVariant
+ * 
+ */
+export type ProductVariant = Prisma.ProductVariantModel
+/**
  * Model Category
  * 
  */
@@ -66,3 +71,8 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model OrderStatusEvent
+ * 
+ */
+export type OrderStatusEvent = Prisma.OrderStatusEventModel

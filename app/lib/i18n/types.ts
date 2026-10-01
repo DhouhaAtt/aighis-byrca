@@ -87,6 +87,7 @@ export interface Translations {
     subtitle: string;
     shippingAddress: string;
     fullName: string;
+    email: string;
     address: string;
     city: string;
     postalCode: string;
@@ -150,6 +151,21 @@ export interface Translations {
     statusTitle: string;
     thankYou: string;
     backToShop: string;
+    contactLabel: string;
+    contactPlaceholder: string;
+    contactHint: string;
+    trackAnother: string;
+    searching: string;
+    errorRequired: string;
+    errorNotFound: string;
+    errorGeneric: string;
+    placedOn: string;
+    lastUpdated: string;
+    totalLabel: string;
+    paymentLabel: string;
+    itemsTitle: string;
+    timelineTitle: string;
+    quantityLabel: string;
     statuses: {
       preparing: string;
       onTheWay: string;
@@ -157,6 +173,15 @@ export interface Translations {
       notPaid: string;
       confirmed: string;
       processing: string;
+    };
+    statusNames: {
+      Pending: string;
+      Confirmed: string;
+      Preparing: string;
+      Ready: string;
+      Shipped: string;
+      Delivered: string;
+      Cancelled: string;
     };
   };
   productData: {

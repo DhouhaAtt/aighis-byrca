@@ -11,6 +11,7 @@ import { useLocale } from "../../../context/LocaleContext";
 import VariantSelector from "./VariantSelector";
 import SizeSelector from "./SizeSelector";
 import AddToCart from "./AddToCart";
+import { discountPercent } from "../../../lib/pricing";
 
 interface Props {
   product: ProductDetail;
@@ -18,11 +19,13 @@ interface Props {
 
 export default function ProductInfo({ product }: Props) {
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "");
   const { isLiked, toggleItem } = useWishlist();
   const { t } = useLocale();
 
   const liked = isLiked(product.id);
+  const discount = discountPercent(product.price, product.originalPrice);
+  const showSale = product.isOnSale && discount !== null;
 
   return (
     <section className={styles.info}>
@@ -30,22 +33,34 @@ export default function ProductInfo({ product }: Props) {
 
       <h1 className={styles.title}>{product.name}</h1>
 
-      <p className={styles.price}>{product.price}</p>
+      {showSale ? (
+        <p className={styles.priceRow}>
+          <span className={styles.originalPrice}>{product.originalPrice}</span>
+          <span className={styles.price}>{product.price}</span>
+          <span className={styles.discountBadge}>-{discount}%</span>
+        </p>
+      ) : (
+        <p className={styles.price}>{product.price}</p>
+      )}
 
       <p className={styles.category}>{product.category}</p>
 
-      <VariantSelector
-        variants={product.colors}
-        selected={selectedColor}
-        onChange={setSelectedColor}
-        label={t.productDetail.color}
-      />
+      {product.colors.length > 0 && (
+        <VariantSelector
+          variants={product.colors}
+          selected={selectedColor}
+          onChange={setSelectedColor}
+          label={t.productDetail.color}
+        />
+      )}
 
-      <SizeSelector
-        sizes={product.sizes}
-        selected={selectedSize}
-        onChange={setSelectedSize}
-      />
+      {product.sizes.length > 0 && (
+        <SizeSelector
+          sizes={product.sizes}
+          selected={selectedSize}
+          onChange={setSelectedSize}
+        />
+      )}
 
       <div className={styles.actions}>
         <AddToCart
@@ -57,6 +72,8 @@ export default function ProductInfo({ product }: Props) {
             image: product.images[0],
           }}
           size={selectedSize}
+          color={selectedColor?.name ?? null}
+          hex={selectedColor?.hex ?? null}
         />
 
         <button

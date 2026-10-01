@@ -3,13 +3,13 @@ import Link from "next/link";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { categoryMap, getProductsBySlug } from "../../lib/categories";
+import { categoryMap } from "../../lib/categories";
+import {
+  getCategoryBySlug,
+  getProductsByCategorySlug,
+} from "../../lib/storefrontProducts";
 import CategoryFilterWrapper from "./CategoryFilterWrapper";
 import styles from "./CategoryPage.module.css";
-
-export function generateStaticParams() {
-  return Object.keys(categoryMap).map((slug) => ({ slug }));
-}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -18,14 +18,18 @@ interface Props {
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
   const info = categoryMap[slug];
-  if (!info) notFound();
+  const dbCategory = info ? null : await getCategoryBySlug(slug);
 
-  const products = getProductsBySlug(slug);
+  if (!info && !dbCategory) notFound();
+
+  const products = await getProductsByCategorySlug(slug);
+  const title = info?.titleEn ?? dbCategory!.name;
+  const subtitle = info?.subtitleEn ?? dbCategory!.description ?? undefined;
 
   return (
     <>
       <Navbar compact />
-      <PageHeader title={info.titleEn} subtitle={info.subtitleEn} />
+      <PageHeader title={title} subtitle={subtitle} />
       {products.length === 0 ? (
         <main className={styles.empty}>
           <p>No products found in this category.</p>

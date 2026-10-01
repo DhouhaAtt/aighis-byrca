@@ -3,25 +3,26 @@ import { prisma } from "../prisma";
 export interface CreateProductInput {
   name: string;
   price: string;
-  originalPrice?: string;
+  originalPrice?: string | null;
   image: string;
-  hoverImage?: string;
-  gender?: string;
+  hoverImage?: string | null;
+  gender?: string | null;
   isOnSale?: boolean;
+  isNewArrival?: boolean;
   stock?: number;
-  tags?: string;
-  collection?: string;
-  description?: string;
-  composition?: string;
-  fit?: string;
-  productCode?: string;
-  careInstructions?: string;
-  images?: string;
-  colors?: string;
-  sizes?: string;
-  shipping?: string;
-  returns?: string;
-  categoryId?: number;
+  tags?: string | null;
+  collection?: string | null;
+  description?: string | null;
+  composition?: string | null;
+  fit?: string | null;
+  productCode?: string | null;
+  careInstructions?: string | null;
+  images?: string | null;
+  colors?: string | null;
+  sizes?: string | null;
+  shipping?: string | null;
+  returns?: string | null;
+  categoryId?: number | null;
 }
 
 export type UpdateProductInput = Partial<CreateProductInput>;
@@ -37,7 +38,7 @@ export const productRepository = {
   async findById(id: number) {
     return prisma.product.findUnique({
       where: { id },
-      include: { category: true },
+      include: { category: true, variants: { orderBy: { id: "asc" } } },
     });
   },
 
