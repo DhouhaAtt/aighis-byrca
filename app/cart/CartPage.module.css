@@ -470,4 +470,37 @@
 
         padding:24px 20px;
     }
+
+    .checkoutBtn{
+
+        width:100%;
+
+        padding:16px 18px;
+
+        font-size:11px;
+
+        letter-spacing:.1em;
+    }
+}
+
+@media(max-width:420px){
+
+    .itemActions{
+
+        padding-left:0;
+
+        gap:12px;
+
+        flex-wrap:wrap;
+    }
+
+    .itemImage{
+
+        width:64px;
+    }
+
+    .itemSize{
+
+        font-size:10px;
+    }
 }

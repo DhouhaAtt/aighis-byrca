@@ -181,6 +181,7 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
+      <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -242,6 +243,7 @@ export default function AdminCategoriesPage() {
           )}
         </tbody>
       </table>
+      </div>
 
       {!loading && filtered.length > PER_PAGE && (
         <div className={styles.pagination}>
