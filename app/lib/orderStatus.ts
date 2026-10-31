@@ -29,7 +29,7 @@ export const ACTIVE_STATUSES: OrderStatus[] = [
 ];
 
 /** Statuses for which the customer gets an email. */
-export const NOTIFY_STATUSES: OrderStatus[] = ["Ready", "Shipped"];
+export const NOTIFY_STATUSES: OrderStatus[] = [...ORDER_STATUSES];
 
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   Pending: "Pending",

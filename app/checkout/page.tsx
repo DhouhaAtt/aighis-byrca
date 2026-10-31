@@ -10,6 +10,7 @@ import Footer from "../components/Footer/Footer";
 import PageHeader from "../components/PageHeader/PageHeader";
 import { useCart } from "../context/CartContext";
 import { useLocale } from "../context/LocaleContext";
+import { getLocalizedProductCopy } from "../lib/i18n/productCopy";
 
 import styles from "./CheckoutPage.module.css";
 
@@ -78,7 +79,11 @@ export default function CheckoutPage() {
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {
-          setFormError(data?.error ?? "Something went wrong. Please try again.");
+          setFormError(
+            res.status === 409
+              ? t.checkout.stockError
+              : t.checkout.errorGeneric
+          );
           return;
         }
 
@@ -87,12 +92,12 @@ export default function CheckoutPage() {
         setSuccess(true);
         clearCart();
       } catch {
-        setFormError("Something went wrong. Please try again.");
+        setFormError(t.checkout.errorGeneric);
       } finally {
         setProcessing(false);
       }
     },
-    [form, payment, items, clearCart]
+    [form, payment, items, clearCart, t]
   );
 
   if (success) {
@@ -101,14 +106,23 @@ export default function CheckoutPage() {
         <Navbar compact />
         <main className={styles.page}>
           <div className={styles.success}>
+            <div style={{ color: "#111", fontFamily: "var(--font-logo)", fontSize: 18, letterSpacing: ".08em", textShadow: "0 2px 5px rgba(0,0,0,.28)", marginBottom: 20 }}>Aighis Byrca</div>
             <CheckCircle size={56} strokeWidth={1.2} className={styles.successIcon} />
             <h1 className={styles.successTitle}>{t.checkout.success}</h1>
             <p className={styles.successMessage}>{t.checkout.successMessage}</p>
             {orderRef && (
               <p className={styles.successMessage}>
-                Order reference: <strong>{orderRef}</strong>
-                {confirmedTotal ? ` — Total: ${confirmedTotal}` : ""}
+                {t.orderTracking.orderRefLabel}: <strong>{orderRef}</strong>
+                {confirmedTotal ? ` — ${t.checkout.total}: ${confirmedTotal}` : ""}
               </p>
+            )}
+            {orderRef && (
+              <Link
+                href={`/order-tracking?ref=${encodeURIComponent(orderRef)}`}
+                className={styles.successBtn}
+              >
+                {t.orderTracking.trackButton}
+              </Link>
             )}
             <Link href="/" className={styles.successBtn}>
               {t.checkout.backToShop}
@@ -271,13 +285,13 @@ export default function CheckoutPage() {
                 <div key={item.lineId} className={styles.summaryItem}>
                   <Image
                     src={item.image}
-                    alt={item.name}
+                    alt={getLocalizedProductCopy(item.id, item.name, t)?.name ?? item.name}
                     width={56}
                     height={72}
                     className={styles.summaryItemImage}
                   />
                   <div className={styles.summaryItemInfo}>
-                    <div className={styles.summaryItemName}>{item.name}</div>
+                    <div className={styles.summaryItemName}>{getLocalizedProductCopy(item.id, item.name, t)?.name ?? item.name}</div>
                   <div className={styles.summaryItemDetail}>
                     {t.cart.size}: {item.size}
                     {item.color ? ` · ${item.color}` : ""} &middot; {t.cart.item}: {item.quantity}

@@ -52,13 +52,13 @@ const WORKFLOW = [
 ] as const;
 
 const STATUS_LABELS: Record<string, string> = {
-  Pending: "Pending",
-  Confirmed: "Confirmed",
-  Preparing: "Preparing",
-  Ready: "Ready",
-  Shipped: "Shipped",
-  Delivered: "Delivered",
-  Cancelled: "Cancelled",
+  Pending: "En attente",
+  Confirmed: "Confirmée",
+  Preparing: "En préparation",
+  Ready: "Prête à retirer",
+  Shipped: "Expédiée",
+  Delivered: "Livrée",
+  Cancelled: "Annulée",
 };
 
 function statusClass(status: string) {
@@ -100,6 +100,14 @@ function lineTotal(price: string, quantity: number): string {
   return Number.isFinite(amount) ? (amount * quantity).toFixed(2) : "—";
 }
 
+function paymentLabel(method: string): string {
+  switch (method) {
+    case "Cash on Delivery": return "Paiement à la livraison";
+    case "Bank Transfer": return "Virement bancaire";
+    default: return method;
+  }
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState("");
@@ -108,6 +116,7 @@ export default function AdminOrdersPage() {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<Order | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Order | null>(null);
   const [busy, setBusy] = useState(false);
   const [snackbar, setSnackbar] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -293,16 +302,16 @@ export default function AdminOrdersPage() {
   return (
     <div>
       <div className={styles.countText}>
-        {loading ? "Loading..." : fetchError ? (
+        {loading ? "Chargement…" : fetchError ? (
           <div style={{ padding: 40, textAlign: "center", color: "#c62828", fontSize: 13 }}>{fetchError}</div>
-        ) : `${filtered.length} order${filtered.length !== 1 ? "s" : ""} total`}
+        ) : `${filtered.length} commande${filtered.length !== 1 ? "s" : ""} au total`}
       </div>
 
       <div className={styles.toolbar}>
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search by ref, name, email, phone..."
+          placeholder="Rechercher par référence, nom, e-mail ou téléphone…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -313,12 +322,23 @@ export default function AdminOrdersPage() {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">All statuses</option>
+            <option value="">Tous les statuts</option>
             {Object.keys(STATUS_LABELS).map((s) => (
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
             ))}
           </select>
-          <button className={styles.actionBtn} onClick={loadOrders} title="Refresh" disabled={loading}>
+          <button
+            className={styles.actionBtn}
+            onClick={() => {
+              setSearch("");
+              setStatusFilter("");
+              setPage(1);
+              loadOrders();
+            }}
+            title="Réinitialiser les filtres et actualiser"
+            aria-label="Réinitialiser les filtres et actualiser les commandes"
+            disabled={loading}
+          >
             <RefreshCw size={16} strokeWidth={1.5} />
           </button>
         </div>
@@ -328,24 +348,24 @@ export default function AdminOrdersPage() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Order</th>
+            <th>Commande</th>
             <th>Date</th>
-            <th>Customer</th>
-            <th>Items</th>
+            <th>Client</th>
+            <th>Articles</th>
             <th>Total</th>
-            <th>Payment</th>
-            <th>Status</th>
+            <th>Paiement</th>
+            <th>Statut</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Loading...</td>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Chargement…</td>
             </tr>
           ) : paginated.length === 0 ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>No orders found</td>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Aucune commande trouvée</td>
             </tr>
           ) : (
             paginated.map((order) => (
@@ -358,7 +378,7 @@ export default function AdminOrdersPage() {
                 </td>
                 <td>{order.items.length}</td>
                 <td>{order.totalAmount}</td>
-                <td style={{ fontSize: 12, color: "#666" }}>{order.paymentMethod}</td>
+                <td style={{ fontSize: 12, color: "#666" }}>{paymentLabel(order.paymentMethod)}</td>
                 <td>
                   <span className={`${styles.status} ${statusClass(order.status)}`}>
                     {STATUS_LABELS[order.status] ?? order.status}
@@ -383,7 +403,7 @@ export default function AdminOrdersPage() {
 
       {!loading && filtered.length > PER_PAGE && (
         <div className={styles.pagination}>
-          <span className={styles.paginationInfo}>{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+          <span className={styles.paginationInfo}>{filtered.length} résultat{filtered.length !== 1 ? "s" : ""}</span>
           <div className={styles.paginationBtns}>
             <button className={styles.paginationBtn} disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</button>
             {renderPages()}
@@ -403,12 +423,12 @@ export default function AdminOrdersPage() {
             </div>
             <div className={styles.modalBody}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 13 }}>
-                <div><strong>Customer:</strong> {detailOrder.customerName}</div>
+                <div><strong>Client :</strong> {detailOrder.customerName}</div>
                 <div><strong>Email:</strong> {detailOrder.customerEmail || "—"}</div>
-                <div><strong>Phone:</strong> {detailOrder.customerPhone}</div>
-                <div><strong>Address:</strong> {detailOrder.address}, {detailOrder.city} {detailOrder.postalCode}</div>
-                <div><strong>Payment:</strong> {detailOrder.paymentMethod}</div>
-                <div><strong>Total:</strong> {detailOrder.totalAmount}</div>
+                <div><strong>Téléphone :</strong> {detailOrder.customerPhone}</div>
+                <div><strong>Adresse :</strong> {detailOrder.address}, {detailOrder.city} {detailOrder.postalCode}</div>
+                <div><strong>Paiement :</strong> {paymentLabel(detailOrder.paymentMethod)}</div>
+                <div><strong>Total :</strong> {detailOrder.totalAmount}</div>
                 <div>
                   <strong>Status:</strong>{" "}
                   <span className={`${styles.status} ${statusClass(detailOrder.status)}`}>
@@ -418,14 +438,14 @@ export default function AdminOrdersPage() {
                 {detailOrder.notes && <div><strong>Notes:</strong> {detailOrder.notes}</div>}
               </div>
 
-              <div style={{ marginTop: 16, fontWeight: 500, fontSize: 13 }}>Items</div>
+              <div style={{ marginTop: 16, fontWeight: 500, fontSize: 13 }}>Articles</div>
               <table className={styles.table} style={{ marginTop: 8 }}>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Size</th>
-                    <th>Color</th>
-                    <th>Qty</th>
+                    <th>Produit</th>
+                    <th>Taille</th>
+                    <th>Couleur</th>
+                    <th>Qté</th>
                     <th>Total</th>
                   </tr>
                 </thead>
@@ -461,7 +481,7 @@ export default function AdminOrdersPage() {
               </table>
 
               <div style={{ marginTop: 20 }}>
-                <div style={{ fontWeight: 500, fontSize: 13, marginBottom: 8 }}>Update status</div>
+                <div style={{ fontWeight: 500, fontSize: 13, marginBottom: 8 }}>Modifier le statut</div>
                 {isTerminal ? (
                   <p style={{ fontSize: 12, color: "#999", margin: 0 }}>
                     This order is closed ({STATUS_LABELS[detailOrder.status]}). Its status can no
@@ -469,7 +489,13 @@ export default function AdminOrdersPage() {
                   </p>
                 ) : (
                   <>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                      <select className={styles.input} value={detailOrder.status} disabled={busy} onChange={(e) => e.target.value === "Cancelled" ? setCancelTarget(detailOrder) : updateStatus(detailOrder.id, e.target.value)}>
+                        {WORKFLOW.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+                        <option value="Cancelled">Annuler la commande…</option>
+                      </select>
+                    </div>
+                    <div style={{ display: "none" }}>
                       {WORKFLOW.map((s) => {
                         const active = detailOrder.status === s;
                         const notifies = s === "Ready" || s === "Shipped";
@@ -545,6 +571,16 @@ export default function AdminOrdersPage() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {cancelTarget && (
+        <div className={styles.overlay} onClick={() => setCancelTarget(null)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ width: 420 }}>
+            <div className={styles.modalHeader}><h3 className={styles.modalTitle}>Confirmer l’annulation</h3><button className={styles.modalClose} onClick={() => setCancelTarget(null)}><X size={18} /></button></div>
+            <div className={styles.modalBody}><p style={{ margin: 0 }}>Annuler la commande <strong>{cancelTarget.orderRef}</strong> ? Le stock réservé sera restitué.</p></div>
+            <div className={styles.modalFooter} style={{ gap: 12 }}><button className={styles.cancelBtn} onClick={() => setCancelTarget(null)}>Garder la commande</button><button className={styles.saveBtn} style={{ background: "#c62828" }} disabled={busy} onClick={async () => { await updateStatus(cancelTarget.id, "Cancelled"); setCancelTarget(null); }}>Confirmer l’annulation</button></div>
           </div>
         </div>
       )}

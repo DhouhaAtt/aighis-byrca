@@ -1,22 +1,16 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "./Pagination.module.css";
 
 interface Props {
   currentPage: number;
   totalPages: number;
-  basePath: string;
+  onPageChange: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, totalPages, basePath }: Props) {
+export default function Pagination({ currentPage, totalPages, onPageChange }: Props) {
   if (totalPages <= 1) return null;
-
-  const getHref = (page: number) => {
-    const separator = basePath.includes("?") ? "&" : "?";
-    return `${basePath}${separator}page=${page}`;
-  };
 
   const pages: (number | "...")[] = [];
   for (let i = 1; i <= totalPages; i++) {
@@ -30,13 +24,13 @@ export default function Pagination({ currentPage, totalPages, basePath }: Props)
   return (
     <nav className={styles.pagination} aria-label="Pagination">
       {currentPage > 1 ? (
-        <Link href={getHref(currentPage - 1)} className={styles.arrow}>
+        <button type="button" onClick={() => onPageChange(currentPage - 1)} className={styles.arrow} aria-label="Previous page">
           <ChevronLeft size={16} strokeWidth={1.5} />
-        </Link>
+        </button>
       ) : (
-        <span className={`${styles.arrow} ${styles.disabled}`}>
+        <button type="button" className={`${styles.arrow} ${styles.disabled}`} aria-label="Previous page" disabled>
           <ChevronLeft size={16} strokeWidth={1.5} />
-        </span>
+        </button>
       )}
 
       <div className={styles.pages}>
@@ -44,25 +38,27 @@ export default function Pagination({ currentPage, totalPages, basePath }: Props)
           p === "..." ? (
             <span key={`ellipsis-${i}`} className={styles.ellipsis}>…</span>
           ) : (
-            <Link
+            <button
+              type="button"
               key={p}
-              href={getHref(p)}
               className={`${styles.page} ${p === currentPage ? styles.active : ""}`}
+              onClick={() => onPageChange(p)}
+              aria-current={p === currentPage ? "page" : undefined}
             >
               {String(p).padStart(2, "0")}
-            </Link>
+            </button>
           )
         )}
       </div>
 
       {currentPage < totalPages ? (
-        <Link href={getHref(currentPage + 1)} className={styles.arrow}>
+        <button type="button" onClick={() => onPageChange(currentPage + 1)} className={styles.arrow} aria-label="Next page">
           <ChevronRight size={16} strokeWidth={1.5} />
-        </Link>
+        </button>
       ) : (
-        <span className={`${styles.arrow} ${styles.disabled}`}>
+        <button type="button" className={`${styles.arrow} ${styles.disabled}`} aria-label="Next page" disabled>
           <ChevronRight size={16} strokeWidth={1.5} />
-        </span>
+        </button>
       )}
     </nav>
   );

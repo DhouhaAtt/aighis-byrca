@@ -90,20 +90,29 @@ function resolveVariant(
 
 /** Restores variant stock for every item of an order. */
 async function restockOrderItems(orderId: number): Promise<void> {
-  const items = await prisma.orderItem.findMany({
-    where: { orderId, variantId: { not: null } },
-  });
+  const items = await prisma.orderItem.findMany({ where: { orderId } });
 
   for (const item of items) {
-    if (item.variantId === null) continue;
-    await prisma.productVariant.update({
-      where: { id: item.variantId },
-      data: { stock: { increment: item.quantity } },
-    });
+    if (item.variantId !== null) {
+      await prisma.productVariant.update({
+        where: { id: item.variantId },
+        data: { stock: { increment: item.quantity } },
+      });
+    } else if (item.productId !== null) {
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: { stock: { increment: item.quantity } },
+      });
+    }
   }
 
   const productIds = [
-    ...new Set(items.map((item) => item.productId).filter((id): id is number => id !== null)),
+    ...new Set(
+      items
+        .filter((item) => item.variantId !== null)
+        .map((item) => item.productId)
+        .filter((id): id is number => id !== null)
+    ),
   ];
 
   for (const productId of productIds) {
@@ -272,16 +281,23 @@ export const orderRepository = {
 
       if (wasActive && becomesInactive) {
         for (const item of existing.items) {
-          if (item.variantId === null) continue;
-          await tx.productVariant.update({
-            where: { id: item.variantId },
-            data: { stock: { increment: item.quantity } },
-          });
+          if (item.variantId !== null) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            });
+          } else if (item.productId !== null) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { increment: item.quantity } },
+            });
+          }
         }
 
         const productIds = [
           ...new Set(
             existing.items
+              .filter((i) => i.variantId !== null)
               .map((i) => i.productId)
               .filter((pid): pid is number => pid !== null)
           ),
@@ -333,7 +349,7 @@ export const orderRepository = {
    * a guessed reference cannot expose somebody else's order.
    */
   async findForTracking(orderRef: string, contact: string) {
-    const ref = orderRef.trim();
+    const ref = orderRef.trim().replace(/[\u200B-\u200D\uFEFF\s]/g, "").toUpperCase();
     const needle = contact.trim().toLowerCase();
     if (!ref || !needle) return null;
 
@@ -345,8 +361,7 @@ export const orderRepository = {
 
     const matches =
       order.customerEmail.toLowerCase() === needle ||
-      order.customerPhone.replace(/[\s.-]/g, "").toLowerCase() ===
-        needle.replace(/[\s.-]/g, "");
+      order.customerPhone.replace(/\D/g, "") === needle.replace(/\D/g, "");
 
     return matches ? order : null;
   },
@@ -359,7 +374,7 @@ export const orderRepository = {
     ]);
 
     const revenue = orders
-      .filter((o) => o.status !== "Cancelled")
+      .filter((o) => o.status === "Delivered")
       .reduce((sum, o) => sum + parsePrice(o.totalAmount), 0);
 
     return {

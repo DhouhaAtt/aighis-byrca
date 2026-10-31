@@ -163,21 +163,21 @@ export default function AdminCategoriesPage() {
   return (
     <div>
       <div className={styles.countText}>
-        {loading ? "Loading..." : fetchError ? (
+        {loading ? "Chargement…" : fetchError ? (
         <div style={{ padding: 40, textAlign: "center", color: "#c62828", fontSize: 13 }}>{fetchError}</div>
-      ) : `${filtered.length} categor${filtered.length === 1 ? "y" : "ies"} total`}
+      ) : `${filtered.length} catégorie${filtered.length !== 1 ? "s" : ""} au total`}
       </div>
 
       <div className={styles.toolbar}>
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search categories..."
+          placeholder="Rechercher une catégorie…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <button className={styles.addBtn} onClick={openAdd}>
-          Add Category
+          Ajouter une catégorie
         </button>
       </div>
 
@@ -185,12 +185,12 @@ export default function AdminCategoriesPage() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Slug</th>
+            <th>Nom</th>
+            <th>Identifiant</th>
             <th>Description</th>
             <th>Order</th>
-            <th>Status</th>
-            <th>Products</th>
+            <th>Statut</th>
+            <th>Produits</th>
             <th></th>
           </tr>
         </thead>
@@ -198,13 +198,13 @@ export default function AdminCategoriesPage() {
           {loading ? (
             <tr>
               <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#888" }}>
-                Loading...
+                Chargement…
               </td>
             </tr>
           ) : paginated.length === 0 ? (
             <tr>
               <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#888" }}>
-                No categories found
+                Aucune catégorie trouvée
               </td>
             </tr>
           ) : (
@@ -224,7 +224,7 @@ export default function AdminCategoriesPage() {
                       cat.isActive ? styles.statusDelivered : styles.statusPending
                     }`}
                   >
-                    {cat.isActive ? "Active" : "Inactive"}
+                    {cat.isActive ? "Activée" : "Désactivée"}
                   </span>
                 </td>
                 <td>{cat._count.products}</td>
@@ -293,7 +293,7 @@ export default function AdminCategoriesPage() {
         <div className={styles.overlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>{editing ? "Edit Category" : "Add Category"}</h3>
+              <h3 className={styles.modalTitle}>{editing ? "Modifier la catégorie" : "Ajouter une catégorie"}</h3>
               <button className={styles.modalClose} onClick={() => setShowModal(false)}>
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -301,7 +301,7 @@ export default function AdminCategoriesPage() {
             <form onSubmit={handleSubmit}>
               <div className={styles.modalBody}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Name</label>
+                  <label className={styles.label}>Nom</label>
                   <input
                     className={styles.input}
                     value={form.name}
@@ -317,7 +317,7 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Slug</label>
+                  <label className={styles.label}>Identifiant URL</label>
                   <input
                     className={styles.input}
                     value={form.slug}
@@ -335,7 +335,7 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Image URL</label>
+                  <label className={styles.label}>URL de l’image</label>
                   <input
                     className={styles.input}
                     value={form.image}
@@ -344,7 +344,7 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Order</label>
+                  <label className={styles.label}>Ordre d’affichage</label>
                   <input
                     className={styles.input}
                     type="number"
@@ -353,14 +353,14 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Active</label>
+                  <label className={styles.label}>Statut</label>
                   <select
                     className={styles.input}
                     value={form.isActive ? "true" : "false"}
                     onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.value === "true" }))}
                   >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
+                    <option value="true">Activée</option>
+                    <option value="false">Désactivée</option>
                   </select>
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function AdminCategoriesPage() {
                   Annuler
                 </button>
                 <button type="submit" className={styles.saveBtn}>
-                  {editing ? "Update" : "Create"}
+                  {editing ? "Enregistrer" : "Créer"}
                 </button>
               </div>
             </form>

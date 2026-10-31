@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { orderRepository, OutOfStockError } from "../../lib/repositories/order.repository";
 import { isAdmin, unauthorized } from "../../lib/requireAdmin";
+import { sendOrderStatusEmail } from "../../lib/email";
+import type { OrderStatus } from "../../lib/orderStatus";
 
 export function generateOrderRef(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -93,7 +95,7 @@ export async function POST(request: Request) {
 
   try {
     const order = await orderRepository.createWithStockReservation({
-      orderRef: text(body.orderRef) || generateOrderRef(),
+      orderRef: generateOrderRef(),
       customerName,
       customerEmail,
       customerPhone,
@@ -110,12 +112,26 @@ export async function POST(request: Request) {
       }[],
     });
 
+    const email = await sendOrderStatusEmail({
+      orderRef: order.orderRef,
+      customerName: order.customerName,
+      customerEmail: order.customerEmail,
+      totalAmount: order.totalAmount,
+      items: order.items.map((item) => ({
+        productName: item.productName,
+        size: item.size,
+        color: item.color,
+        quantity: item.quantity,
+      })),
+    }, order.status as OrderStatus);
+
     return NextResponse.json(
       {
         orderRef: order.orderRef,
         totalAmount: order.totalAmount,
         status: order.status,
         itemCount: order.items.length,
+        email,
       },
       { status: 201 }
     );

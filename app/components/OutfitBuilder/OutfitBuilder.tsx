@@ -1,26 +1,29 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
 
 import styles from "./OutfitBuilder.module.css";
+import { useLocale } from "../../context/LocaleContext";
 
 export default function OutfitBuilder() {
+  const { t } = useLocale();
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <div className={styles.inner}>
-          <span className={styles.overline}>Styled for you</span>
+          <span className={styles.overline}>{t.home.outfitEyebrow}</span>
           <h2 className={styles.title}>
-            Let Us Prepare<br />Your Outfit
+            {t.home.outfitTitle}
           </h2>
           <p className={styles.subtitle}>
-            Tell us your mood, your event, your favorite colors and let us
-            craft a complete look that speaks to who you are.
+            {t.home.outfitDescription}
           </p>
           <Link href="/outfit-builder" className={styles.ctaButton}>
             <Sparkles size={16} strokeWidth={1.5} />
-            Prepare My Outfit
+            {t.home.outfitCta}
             <ArrowRight size={16} strokeWidth={1.5} />
           </Link>
         </div>

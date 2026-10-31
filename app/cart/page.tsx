@@ -9,6 +9,8 @@ import Footer from "../components/Footer/Footer";
 import PageHeader from "../components/PageHeader/PageHeader";
 import { useCart } from "../context/CartContext";
 import { useLocale } from "../context/LocaleContext";
+import { getLocalizedProductCopy } from "../lib/i18n/productCopy";
+import { useState } from "react";
 
 import styles from "./CartPage.module.css";
 
@@ -16,6 +18,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, totalItems } =
     useCart();
   const { t } = useLocale();
+  const [notice, setNotice] = useState("");
 
   return (
     <>
@@ -31,6 +34,7 @@ export default function CartPage() {
       />
 
       <main className={styles.page}>
+        {notice && <p role="status" aria-live="polite">{notice}</p>}
         {items.length === 0 ? (
           <div className={styles.empty}>
             <ShoppingBag size={48} strokeWidth={1} className={styles.emptyIcon} />
@@ -52,7 +56,7 @@ export default function CartPage() {
                   >
                     <Image
                       src={item.image}
-                      alt={item.name}
+                      alt={getLocalizedProductCopy(item.id, item.name, t)?.name ?? item.name}
                       width={120}
                       height={153}
                       className={styles.image}
@@ -64,7 +68,7 @@ export default function CartPage() {
                       href={`/products/${item.id}`}
                       className={styles.itemName}
                     >
-                      {item.name}
+                      {getLocalizedProductCopy(item.id, item.name, t)?.name ?? item.name}
                     </Link>
 
                     <p className={styles.itemSize}>
@@ -106,7 +110,7 @@ export default function CartPage() {
                     </p>
 
                     <button
-                      onClick={() => removeItem(item.lineId)}
+                      onClick={() => { removeItem(item.lineId); setNotice(t.cart.removedSuccessfully); window.setTimeout(() => setNotice(""), 2500); }}
                       className={styles.removeBtn}
                       aria-label={t.cart.removeItem}
                     >
@@ -137,7 +141,7 @@ export default function CartPage() {
                 <span>{totalPrice} {t.cart.currency}</span>
               </div>
 
-              <Link href="#" className={styles.checkoutBtn}>{t.cart.checkout}</Link>
+              <Link href="/checkout" className={styles.checkoutBtn}>{t.cart.checkout}</Link>
 
               <Link href="/products" className={styles.continueShopping}>
                 <ArrowLeft size={14} strokeWidth={1.5} />

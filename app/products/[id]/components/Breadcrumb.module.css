@@ -13,6 +13,12 @@
     text-transform:uppercase;
 
     color:#999;
+
+    max-width:var(--max-width);
+
+    margin:0 auto;
+
+    padding:24px 40px 0;
 }
 
 .link{
@@ -35,4 +41,14 @@
     margin-left:8px;
 
     color:#ccc;
+}
+
+@media(max-width:640px){
+
+    .breadcrumb{
+
+        padding:18px 16px 0;
+
+        flex-wrap:wrap;
+    }
 }

@@ -68,7 +68,7 @@ export default function Navbar({ compact = false }: Props) {
           <input
             ref={inputRef}
             type="text"
-            placeholder="Search by category or product title..."
+            placeholder={t.search.placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className={styles.searchInput}
@@ -80,7 +80,7 @@ export default function Navbar({ compact = false }: Props) {
 
         {!query.trim() ? (
           <div className={styles.searchCategories}>
-            <p className={styles.searchCategoriesLabel}>Browse by Category</p>
+            <p className={styles.searchCategoriesLabel}>{t.search.browseCategories}</p>
             <div className={styles.searchCategoriesGrid}>
               {t.nav.center.map((item) => (
                 <Link
@@ -97,7 +97,7 @@ export default function Navbar({ compact = false }: Props) {
         ) : (
           <div className={styles.searchResults}>
             {results.length === 0 ? (
-              <p className={styles.searchNoResults}>No results found</p>
+              <p className={styles.searchNoResults}>{t.search.noResults}</p>
             ) : (
               results.map((product) => (
                 <Link

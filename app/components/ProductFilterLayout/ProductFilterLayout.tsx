@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useLocale } from "../../context/LocaleContext";
 import { SlidersHorizontal, X } from "lucide-react";
 import styles from "./ProductFilterLayout.module.css";
 
@@ -26,12 +28,6 @@ const INITIAL_FILTERS: Filters = {
   priceMax: 999,
   size: "all",
   color: "all",
-};
-
-const GENDER_MAP: Record<string, string> = {
-  Women: "women",
-  Men: "men",
-  Unisex: "unisex",
 };
 
 const CLOTHING_SIZES_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "One Size"];
@@ -139,16 +135,22 @@ function RangeSlider({
 
 interface Props {
   products: Product[];
-  basePath: string;
 }
 
-export default function ProductFilterLayout({ products, basePath }: Props) {
+export default function ProductFilterLayout({ products }: Props) {
+  const { t } = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const requestedPage = Number(pageParam);
+  const initialPage = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [page, setPage] = useState(1);
 
   const priceBounds = useMemo(() => {
     const prices = products.map(parsePrice);
+    if (prices.length === 0) return { min: 0, max: 999 };
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [products]);
 
@@ -176,23 +178,31 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
   const allGenders = useMemo(() => {
     const genders = [...new Set(products.map((p) => p.gender).filter(Boolean) as string[])];
     return genders.map((g) => {
-      const label = Object.entries(GENDER_MAP).find(([, v]) => v === g)?.[0] || g;
+      const label = t.filters.genders[g] || g;
       return { key: g, label };
     });
-  }, [products]);
+  }, [products, t.filters.genders]);
+
+  const resetPageInUrl = useCallback(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!params.has("page")) return;
+    params.delete("page");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [pathname, router, searchParams]);
 
   const setFilter = useCallback(
     <K extends keyof Filters>(key: K, value: Filters[K]) => {
       setFilters((prev) => ({ ...prev, [key]: value }));
-      setPage(1);
+      resetPageInUrl();
     },
-    []
+    [resetPageInUrl]
   );
 
   const resetFilters = useCallback(() => {
     setFilters(INITIAL_FILTERS);
-    setPage(1);
-  }, []);
+    resetPageInUrl();
+  }, [resetPageInUrl]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -207,11 +217,19 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
   }, [products, filters]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const currentPage = Math.min(page, totalPages);
-  const paginated = filtered.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE
-  );
+  const changePage = useCallback((nextPage: number) => {
+    const pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+    const safePage = Math.max(1, Math.min(nextPage, pageCount));
+    const params = new URLSearchParams(searchParams.toString());
+    if (safePage === 1) params.delete("page");
+    else params.set("page", String(safePage));
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [filtered.length, pathname, router, searchParams]);
+  const currentPage = Math.min(initialPage, totalPages);
+  const startIndex = (currentPage - 1) * PER_PAGE;
+  const endIndex = startIndex + PER_PAGE;
+  const paginated = filtered.slice(startIndex, endIndex);
 
   const hasActiveFilters =
     filters.gender !== "all" ||
@@ -225,13 +243,13 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
     <>
       {allGenders.length > 1 && (
         <div className={styles.filterSection}>
-          <div className={styles.filterSectionTitle}>Gender</div>
+          <div className={styles.filterSectionTitle}>{t.filters.gender}</div>
           <div className={styles.filterSectionContent}>
             <button
               className={`${styles.filterItem} ${filters.gender === "all" ? styles.filterItemActive : ""}`}
               onClick={() => setFilter("gender", "all")}
             >
-              All
+              {t.filters.all}
             </button>
             {allGenders.map((g) => (
               <button
@@ -270,7 +288,7 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
       )} */}
 
       <div className={styles.filterSection}>
-        <div className={styles.filterSectionTitle}>Price</div>
+        <div className={styles.filterSectionTitle}>{t.filters.price}</div>
         <div className={styles.filterSectionContent}>
           <RangeSlider
             min={priceBounds.min}
@@ -285,13 +303,13 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
 
       {allSizes.length > 0 && (
         <div className={styles.filterSection}>
-          <div className={styles.filterSectionTitle}>Size</div>
+        <div className={styles.filterSectionTitle}>{t.filters.size}</div>
           <div className={styles.filterSectionContent}>
             <button
               className={`${styles.filterItem} ${filters.size === "all" ? styles.filterItemActive : ""}`}
               onClick={() => setFilter("size", "all")}
             >
-              All
+              {t.filters.all}
             </button>
             {allSizes.map((s) => (
               <button
@@ -308,12 +326,12 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
 
       {allColors.length > 0 && (
         <div className={styles.filterSection}>
-          <div className={styles.filterSectionTitle}>Color</div>
+          <div className={styles.filterSectionTitle}>{t.filters.color}</div>
           <div className={styles.colorGrid}>
             <button
               className={`${styles.colorSwatch} ${filters.color === "all" ? styles.colorSwatchActive : ""}`}
               onClick={() => setFilter("color", "all")}
-              title="All Colors"
+              title={t.filters.allColors}
             >
               <span
                 className={styles.colorDot}
@@ -341,7 +359,7 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
 
       {hasActiveFilters && (
         <button className={styles.resetBtn} onClick={resetFilters}>
-          Clear All Filters
+          {t.filters.clear}
         </button>
       )}
     </>
@@ -355,7 +373,7 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
         onClick={() => setDrawerOpen(true)}
       >
         <SlidersHorizontal size={16} strokeWidth={1.5} />
-        Filters
+        {t.filters.filters}
         {hasActiveFilters && <span className={styles.filterBadge} />}
       </button>
 
@@ -371,7 +389,7 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
         className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ""}`}
       >
         <div className={styles.drawerHeader}>
-          <span className={styles.drawerTitle}>Filters</span>
+          <span className={styles.drawerTitle}>{t.filters.filters}</span>
           <button
             className={styles.drawerClose}
             onClick={() => setDrawerOpen(false)}
@@ -385,14 +403,14 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
       {/* PRODUCTS */}
       <main className={styles.main}>
         <div className={styles.resultCount}>
-          {filtered.length} {filtered.length === 1 ? "product" : "products"}
+          {filtered.length} {filtered.length === 1 ? t.filters.product : t.filters.products}
         </div>
 
         {paginated.length === 0 ? (
           <div className={styles.empty}>
-            <p className={styles.emptyText}>No products match your filters.</p>
+          <p className={styles.emptyText}>{t.filters.noProducts}</p>
             <button className={styles.resetBtn} onClick={resetFilters}>
-              Clear All Filters
+              {t.filters.clear}
             </button>
           </div>
         ) : (
@@ -408,7 +426,7 @@ export default function ProductFilterLayout({ products, basePath }: Props) {
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  basePath={basePath}
+                  onPageChange={changePage}
                 />
               </div>
             )}

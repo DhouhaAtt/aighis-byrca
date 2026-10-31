@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import styles from "./AboutSection.module.css";
+import { useLocale } from "../../context/LocaleContext";
 
 export default function AboutSection() {
+  const { t } = useLocale();
   return (
     <section className={styles.section}>
       <div className={styles.grid}>
@@ -19,23 +23,12 @@ export default function AboutSection() {
 
         <div className={styles.textCol}>
           <h2 className={styles.heading}>
-            Where Strength<br />Meets Elegance
+            {t.home.aboutTitle}
           </h2>
 
-          <p className={styles.paragraph}>
-            Aighis Byrca was born from a vision where every garment becomes a
-            symbol of self-mastery. Inspired by the timeless principles of
-            stoic philosophy, the brand speaks to those who remain composed in
-            chaos, disciplined in ambition, and unwavering in the pursuit of
-            greatness.
-          </p>
-
-          <p className={styles.paragraph}>
-            Every piece is designed for individuals who understand that true
-            power lies not in dominating others, but in mastering oneself.
-            This is not fashion made to follow trends, it is fashion created
-            for those who lead, inspire, and leave a lasting mark.
-          </p>
+          {t.home.aboutParagraphs.map((paragraph) => (
+            <p key={paragraph} className={styles.paragraph}>{paragraph}</p>
+          ))}
         </div>
       </div>
     </section>

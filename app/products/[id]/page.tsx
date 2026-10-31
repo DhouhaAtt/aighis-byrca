@@ -3,8 +3,7 @@ import { connection } from "next/server";
 
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
-import PageHeader from "../../components/PageHeader/PageHeader";
-import Breadcrumb from "./components/Breadcrumb";
+import ProductDetailHeading from "./components/ProductDetailHeading";
 import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
 import ProductAccordion from "./components/ProductAccordion";
@@ -81,18 +80,9 @@ export default async function ProductDetailPage({ params }: Props) {
     <>
       <Navbar compact />
 
-      <PageHeader title={product.name} subtitle={product.collection} />
+      <ProductDetailHeading product={product} />
 
       <main className={styles.page}>
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Products", href: "/products" },
-            { label: product.category, href: "#" },
-            { label: product.name },
-          ]}
-        />
-
         <div className={styles.layout}>
           <ProductGallery images={product.images} name={product.name} />
 
@@ -101,7 +91,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
         <ProductAccordion product={product} />
 
-        <RelatedProducts products={related} title="Complete the Look" />
+        <RelatedProducts products={related} />
       </main>
 
       <Footer />

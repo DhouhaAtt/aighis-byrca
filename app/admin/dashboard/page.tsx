@@ -44,10 +44,10 @@ export default function AdminDashboard() {
 
   const statCards = stats
     ? [
-        { value: String(stats.totalProducts), label: "Products", icon: Package, dark: true },
-        { value: String(stats.totalCategories), label: "Categories", icon: Tags, dark: false },
-        { value: String(stats.totalOrders), label: "Orders", icon: ShoppingBag, dark: true },
-        { value: `${stats.revenue.toFixed(2)} Tnd`, label: "Revenue", icon: DollarSign, dark: false },
+        { value: String(stats.totalProducts), label: "Produits", icon: Package, dark: true },
+        { value: String(stats.totalCategories), label: "Catégories", icon: Tags, dark: false },
+        { value: String(stats.totalOrders), label: "Commandes", icon: ShoppingBag, dark: true },
+        { value: `${stats.revenue.toFixed(2)} Tnd`, label: "Chiffre d’affaires", icon: DollarSign, dark: false },
       ]
     : [];
 
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
         ))}
         {loading && (
           <div style={{ gridColumn: "1 / -1", padding: 40, textAlign: "center", color: "#888", fontSize: 13 }}>
-            Loading...
+            Chargement…
           </div>
         )}
         {fetchError && (
@@ -81,20 +81,20 @@ export default function AdminDashboard() {
 
       <div className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Recent Orders</h2>
+          <h2 className={styles.sectionTitle}>Commandes récentes</h2>
           <Link href="/admin/dashboard/orders" className={styles.sectionLink}>
-            View All
+            Tout voir
           </Link>
         </div>
 
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Order</th>
-              <th>Customer</th>
-              <th>Items</th>
+              <th>Commande</th>
+              <th>Client</th>
+              <th>Articles</th>
               <th>Total</th>
-              <th>Status</th>
+              <th>Statut</th>
             </tr>
           </thead>
           <tbody>
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
             {!loading && orders.length === 0 && (
               <tr>
                 <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#888" }}>
-                  No orders yet
+                  Aucune commande pour le moment
                 </td>
               </tr>
             )}

@@ -15,14 +15,14 @@ export default function CategoriesSection() {
     1: t.categories.tops,
     2: t.categories.bottoms,
     3: t.categories.underwear,
-    4: t.categories.bags,
+    4: "Enfants",
   };
 
   const subtitles: Record<number, string> = {
     1: t.categories.springSummer,
     2: t.categories.springSummer,
     3: t.categories.intimate,
-    4: t.categories.signature,
+    4: "Collection Enfants",
   };
 
   return (

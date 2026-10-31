@@ -99,6 +99,20 @@ const emptyForm = {
 
 const PER_PAGE = 10;
 
+function getSafeProductImage(source: string | null | undefined): string {
+  if (!source) return "/assets/products/product1.png";
+
+  const value = source.trim();
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.toString() : "/assets/products/product1.png";
+  } catch {
+    return "/assets/products/product1.png";
+  }
+}
+
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
 
 const COLOR_PALETTE: ColorOption[] = [
@@ -252,7 +266,7 @@ function ImageUpload({ label, value, onChange, onUpload }: {
         />
         <div className={styles.imageUploadLabel}>
           <Upload size={16} strokeWidth={1.5} />
-          {uploading ? "Uploading..." : "Click to upload or drag & drop"}
+          {uploading ? "Envoi en cours…" : "Cliquez pour choisir une image ou glissez-déposez le fichier"}
           <span>JPG, PNG, WebP — max 5MB</span>
         </div>
       </div>
@@ -261,7 +275,7 @@ function ImageUpload({ label, value, onChange, onUpload }: {
         style={{ marginTop: 6 }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Or paste image URL"
+        placeholder="Ou collez l’URL de l’image"
       />
     </div>
   );
@@ -588,21 +602,21 @@ export default function AdminProductsPage() {
   return (
     <div>
       <div className={styles.countText}>
-        {loading ? "Loading..." : fetchError ? (
+        {loading ? "Chargement…" : fetchError ? (
           <div style={{ padding: 40, textAlign: "center", color: "#c62828", fontSize: 13 }}>{fetchError}</div>
-        ) : `${filtered.length} product${filtered.length !== 1 ? "s" : ""} total`}
+        ) : `${filtered.length} produit${filtered.length !== 1 ? "s" : ""} au total`}
       </div>
 
       <div className={styles.toolbar}>
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Search products..."
+          placeholder="Rechercher un produit…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <button className={styles.addBtn} onClick={openAdd}>
-          Add Product
+          Ajouter un produit
         </button>
       </div>
 
@@ -610,31 +624,31 @@ export default function AdminProductsPage() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Category</th>
+            <th>Produit</th>
+            <th>Prix</th>
+            <th>Catégorie</th>
             <th>Collection</th>
-            <th>Gender</th>
+            <th>Genre</th>
             <th>Stock</th>
-            <th>Status</th>
+            <th>Statut</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Loading...</td>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Chargement…</td>
             </tr>
           ) : paginated.length === 0 ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>No products found</td>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Aucun produit trouvé</td>
             </tr>
           ) : (
             paginated.map((product) => (
               <tr key={product.id}>
                 <td>
                   <div className={styles.productCell}>
-                    <Image src={product.image} alt={product.name} width={44} height={57} className={styles.productThumb} />
+                    <Image src={getSafeProductImage(product.image)} alt={product.name} width={44} height={57} className={styles.productThumb} />
                     <span className={styles.productName}>{product.name}</span>
                   </div>
                 </td>
@@ -653,12 +667,12 @@ export default function AdminProductsPage() {
                 <td>
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     {product.isOnSale ? (
-                      <span className={`${styles.badge} ${styles.badgeSale}`}>Sale</span>
+                      <span className={`${styles.badge} ${styles.badgeSale}`}>En promotion</span>
                     ) : (
-                      <span className={`${styles.badge} ${styles.badgeActive}`}>Active</span>
+                      <span className={`${styles.badge} ${styles.badgeActive}`}>Actif</span>
                     )}
                     {product.isNewArrival && (
-                      <span className={`${styles.badge} ${styles.badgeActive}`}>New Arrival</span>
+                      <span className={`${styles.badge} ${styles.badgeActive}`}>Nouveauté</span>
                     )}
                   </div>
                 </td>
@@ -689,29 +703,29 @@ export default function AdminProductsPage() {
       {showModal && (
         <div className={styles.overlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>{editing ? "Edit Product" : "Add Product"}</h3>
+              <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>{editing ? "Modifier le produit" : "Ajouter un produit"}</h3>
               <button className={styles.modalClose} onClick={() => setShowModal(false)}><X size={18} strokeWidth={1.5} /></button>
             </div>
             <form onSubmit={handleSubmit}>
               <div className={styles.modalBody}>
                 <div className={styles.field}>
-                  <label className={styles.label}>Name</label>
+                  <label className={styles.label}>Nom</label>
                   <input className={styles.input} value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
                 </div>
                 <div className={styles.row}>
                   <div className={styles.field}>
-                    <label className={styles.label}>Price</label>
+                    <label className={styles.label}>Prix</label>
                     <input className={styles.input} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} required />
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>Original Price</label>
+                    <label className={styles.label}>Prix initial</label>
                     <input className={styles.input} value={form.originalPrice} onChange={(e) => setForm((f) => ({ ...f, originalPrice: e.target.value }))} placeholder="Optional" />
                   </div>
                 </div>
 
                 <ImageUpload
-                  label="Main Image"
+                  label="Image principale"
                   value={form.image}
                   onChange={(url) => setForm((f) => ({ ...f, image: url }))}
                   onUpload={async (files) => {
@@ -721,7 +735,7 @@ export default function AdminProductsPage() {
                 />
 
                 <ImageUpload
-                  label="Hover Image"
+                  label="Image au survol"
                   value={form.hoverImage}
                   onChange={(url) => setForm((f) => ({ ...f, hoverImage: url }))}
                   onUpload={async (files) => {
@@ -731,7 +745,7 @@ export default function AdminProductsPage() {
                 />
 
                 <div className={styles.field}>
-                  <label className={styles.label}>Additional Images (max 4)</label>
+                  <label className={styles.label}>Images supplémentaires (4 maximum)</label>
                   {form.extraImages.length > 0 && (
                     <div className={styles.imagePreviews}>
                       {form.extraImages.map((url, idx) => (
@@ -754,8 +768,8 @@ export default function AdminProductsPage() {
                       />
                       <div className={styles.imageUploadLabel}>
                         <Upload size={16} strokeWidth={1.5} />
-                        {extraUploading ? "Uploading..." : `Add image (${form.extraImages.length}/4)`}
-                        <span>Click to upload</span>
+                        {extraUploading ? "Envoi en cours…" : `Ajouter une image (${form.extraImages.length}/4)`}
+                        <span>Cliquez pour choisir un fichier</span>
                       </div>
                     </div>
                   )}
@@ -763,15 +777,15 @@ export default function AdminProductsPage() {
 
                 <div className={styles.row}>
                   <div className={styles.field}>
-                    <label className={styles.label}>Gender</label>
+                    <label className={styles.label}>Genre</label>
                     <select className={styles.input} value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}>
                       <option value="">-</option>
-                      <option value="women">Women</option>
-                      <option value="men">Men</option>
+                      <option value="women">Femme</option>
+                      <option value="men">Homme</option>
                     </select>
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>Category</label>
+                    <label className={styles.label}>Catégorie</label>
                     <select className={styles.input} value={form.categoryId} onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}>
                       <option value="">-</option>
                       {categories.map((c) => (
@@ -800,11 +814,11 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Tags</label>
+                    <label className={styles.label}>Mots-clés</label>
                   <input className={styles.input} value={form.tags} onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))} placeholder="Comma separated: women,sale,new-in" />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Product Code</label>
+                    <label className={styles.label}>Référence produit</label>
                   <input className={styles.input} value={form.productCode} onChange={(e) => setForm((f) => ({ ...f, productCode: e.target.value }))} />
                 </div>
                 <div className={styles.field}>
@@ -822,11 +836,11 @@ export default function AdminProductsPage() {
                   />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Fit</label>
+                  <label className={styles.label}>Coupe</label>
                   <input className={styles.input} value={form.fit} onChange={(e) => setForm((f) => ({ ...f, fit: e.target.value }))} placeholder="e.g. Regular fit" />
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Sizes</label>
+                  <label className={styles.label}>Tailles</label>
                   <div className={styles.chipGroup}>
                     {allSizes.map((size) => {
                       const active = form.sizes.includes(size);
@@ -846,11 +860,11 @@ export default function AdminProductsPage() {
                   {form.sizes.length > 0 ? (
                     <span className={styles.hint}>{form.sizes.length} size{form.sizes.length > 1 ? "s" : ""} selected: {form.sizes.join(", ")}</span>
                   ) : (
-                    <span className={styles.hint}>No size selected yet.</span>
+                    <span className={styles.hint}>Aucune taille sélectionnée.</span>
                   )}
                 </div>
                 <div className={styles.field}>
-                  <label className={styles.label}>Colors</label>
+                  <label className={styles.label}>Couleurs</label>
                   <div className={styles.swatchGrid}>
                     {COLOR_PALETTE.map((color) => {
                       const active = form.colors.some(
@@ -898,20 +912,20 @@ export default function AdminProductsPage() {
                     </div>
                   )}
                   {form.colors.length === 0 && (
-                    <span className={styles.hint}>No color selected yet.</span>
+                    <span className={styles.hint}>Aucune couleur sélectionnée.</span>
                   )}
                 </div>
 
                 <div className={styles.field}>
-                  <label className={styles.label}>Stock per size / colour</label>
+                  <label className={styles.label}>Stock par taille et couleur</label>
                   {variantsLoading ? (
-                    <span className={styles.hint}>Loading current stock…</span>
+                    <span className={styles.hint}>Chargement du stock…</span>
                   ) : (
                     <>
                       <table className={styles.variantTable}>
                         <thead>
                           <tr>
-                            <th>Size</th>
+                            <th>Taille</th>
                             <th>Colour</th>
                             <th>Stock</th>
                           </tr>
@@ -966,12 +980,12 @@ export default function AdminProductsPage() {
                             style={{ fontSize: 11, textDecoration: "underline" }}
                             onClick={distributeTotal}
                           >
-                            Split total evenly
+                            Répartir le stock équitablement
                           </button>
                         )}
                       </div>
                       <span className={styles.hint}>
-                        Customers can only buy what is available for their exact size and colour.
+                        Les clients ne peuvent commander que les tailles et couleurs disponibles.
                       </span>
                     </>
                   )}
@@ -980,7 +994,7 @@ export default function AdminProductsPage() {
                     form state so existing values are round-tripped untouched; uncomment to
                     edit them again. */}
                 {/* <div className={styles.field}>
-                  <label className={styles.label}>Care Instructions</label>
+                  <label className={styles.label}>Conseils d’entretien</label>
                   <textarea
                     className={styles.textarea}
                     rows={3}
@@ -991,16 +1005,16 @@ export default function AdminProductsPage() {
                 </div> */}
                 <label className={styles.checkboxLabel}>
                   <input type="checkbox" checked={form.isOnSale} onChange={(e) => setForm((f) => ({ ...f, isOnSale: e.target.checked }))} />
-                  On Sale
+                  En promotion
                 </label>
                 <label className={styles.checkboxLabel}>
                   <input type="checkbox" checked={form.isNewArrival} onChange={(e) => setForm((f) => ({ ...f, isNewArrival: e.target.checked }))} />
-                  Show in New Arrivals (homepage)
+                  Afficher dans les nouveautés (accueil)
                 </label>
               </div>
               <div className={styles.modalFooter} style={{ gap: 12 }}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Annuler</button>
-                <button type="submit" className={styles.saveBtn}>{editing ? "Update" : "Create"}</button>
+                <button type="submit" className={styles.saveBtn}>{editing ? "Enregistrer" : "Créer"}</button>
               </div>
             </form>
           </div>

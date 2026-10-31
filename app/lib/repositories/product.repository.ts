@@ -50,6 +50,14 @@ export const productRepository = {
     });
   },
 
+  async findStorefrontByCategorySlug(slug: string) {
+    return prisma.product.findMany({
+      where: { OR: [{ category: { slug } }, { tags: { contains: slug } }] },
+      include: { category: true },
+      orderBy: { id: "asc" },
+    });
+  },
+
   /** Public lookup used to rehydrate a customer's saved wishlist. */
   async findManyByIds(ids: number[]) {
     if (ids.length === 0) return [];

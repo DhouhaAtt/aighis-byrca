@@ -75,14 +75,16 @@ export async function getProductsByGender(
 }
 
 export async function getProductsByCategorySlug(slug: string): Promise<Product[]> {
-  const rows = await fetchRows();
+  await connection();
   const target = slug.toLowerCase();
-
-  return rows
-    .filter((row) => {
-      if (row.category?.slug.toLowerCase() === target) return true;
-      return parseTags(row.tags).includes(target);
-    })
+  try {
+    const rows = await productRepository.findStorefrontByCategorySlug(target);
+    if (rows.length > 0) return rows.map(toStorefrontProduct);
+  } catch (error) {
+    console.error("[storefront] category query unavailable, using fallback", error);
+  }
+  return getFallbackRows()
+    .filter((row) => row.category?.slug.toLowerCase() === target || parseTags(row.tags).includes(target))
     .map(toStorefrontProduct);
 }
 

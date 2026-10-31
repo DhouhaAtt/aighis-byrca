@@ -259,10 +259,11 @@
   padding: 80px 20px;
   max-width: 480px;
   margin: 0 auto;
+  color: #287a45;
 }
 
 .successIcon {
-  color: #111;
+  color: #287a45;
   margin-bottom: 24px;
 }
 
@@ -270,7 +271,7 @@
   font-family: var(--font-logo);
   font-size: 1.8rem;
   font-weight: 400;
-  color: #111;
+  color: #287a45;
   margin-bottom: 12px;
 }
 
@@ -293,6 +294,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   transition: background 0.35s;
+  margin: 0 8px 12px;
 }
 
 .successBtn:hover {

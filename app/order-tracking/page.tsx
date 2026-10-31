@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Package,
@@ -53,23 +53,23 @@ const STATUS_STYLE: Record<string, { icon: LucideIcon; color: string; key: strin
   Ready: { icon: Package, color: "#4A7C59", key: "confirmed" },
   Shipped: { icon: Truck, color: "#111", key: "onTheWay" },
   Delivered: { icon: CheckCircle, color: "#4A7C59", key: "delivered" },
-  Cancelled: { icon: AlertCircle, color: "#8B4513", key: "notPaid" },
+  Cancelled: { icon: AlertCircle, color: "#8B4513", key: "cancelled" },
 };
 
-function formatDate(value: string): string {
+function formatDate(value: string, locale: "en" | "fr"): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(locale === "fr" ? "fr-FR" : "en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 }
 
-function formatDateTime(value: string): string {
+function formatDateTime(value: string, locale: "en" | "fr"): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString(locale === "fr" ? "fr-FR" : "en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -79,12 +79,17 @@ function formatDateTime(value: string): string {
 }
 
 export default function OrderTrackingPage() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [ref, setRef] = useState("");
   const [contact, setContact] = useState("");
   const [order, setOrder] = useState<TrackedOrder | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const initialRef = new URLSearchParams(window.location.search).get("ref");
+    if (initialRef) setRef(initialRef);
+  }, []);
 
   const handleTrack = useCallback(
     async (e: React.FormEvent) => {
@@ -108,7 +113,11 @@ export default function OrderTrackingPage() {
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {
-          setError(data?.error ?? t.orderTracking.errorNotFound);
+          setError(
+            res.status === 404
+              ? t.orderTracking.errorNotFound
+              : t.orderTracking.errorGeneric
+          );
           setOrder(null);
           return;
         }
@@ -137,6 +146,15 @@ export default function OrderTrackingPage() {
   const statusName = order
     ? (t.orderTracking.statusNames as Record<string, string>)[order.status] ??
       order.status
+    : "";
+  const paymentMethodLabel = order
+    ? order.paymentMethod === "Cash on Delivery"
+      ? t.checkout.onDelivery
+      : order.paymentMethod === "Bank Transfer"
+        ? t.checkout.bankTransfer
+        : order.paymentMethod === "D17"
+          ? t.checkout.d17
+          : order.paymentMethod
     : "";
 
   return (
@@ -238,7 +256,7 @@ export default function OrderTrackingPage() {
                     {t.orderTracking.placedOn}
                   </span>
                   <span className={styles.metaValue}>
-                    {formatDate(order.createdAt)}
+                    {formatDate(order.createdAt, locale)}
                   </span>
                 </div>
                 <div>
@@ -246,14 +264,14 @@ export default function OrderTrackingPage() {
                     {t.orderTracking.lastUpdated}
                   </span>
                   <span className={styles.metaValue}>
-                    {formatDateTime(order.updatedAt)}
+                    {formatDateTime(order.updatedAt, locale)}
                   </span>
                 </div>
                 <div>
                   <span className={styles.metaLabel}>
                     {t.orderTracking.paymentLabel}
                   </span>
-                  <span className={styles.metaValue}>{order.paymentMethod}</span>
+                  <span className={styles.metaValue}>{paymentMethodLabel}</span>
                 </div>
                 <div>
                   <span className={styles.metaLabel}>
@@ -296,7 +314,7 @@ export default function OrderTrackingPage() {
                           ] ?? event.status}
                         </span>
                         <span className={styles.timelineDate}>
-                          {formatDateTime(event.createdAt)}
+                          {formatDateTime(event.createdAt, locale)}
                         </span>
                       </div>
                     </li>

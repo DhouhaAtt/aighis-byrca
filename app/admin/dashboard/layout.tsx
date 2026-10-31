@@ -9,10 +9,10 @@ import adminStyles from "./AdminTable.module.css";
 import styles from "./AdminLayout.module.css";
 
 const navLinks = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/dashboard/products", label: "Products", icon: Package },
-  { href: "/admin/dashboard/categories", label: "Categories", icon: Tags },
-  { href: "/admin/dashboard/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+  { href: "/admin/dashboard/products", label: "Produits", icon: Package },
+  { href: "/admin/dashboard/categories", label: "Catégories", icon: Tags },
+  { href: "/admin/dashboard/orders", label: "Commandes", icon: ShoppingBag },
 ];
 
 export default function AdminDashboardLayout({
@@ -38,11 +38,11 @@ export default function AdminDashboardLayout({
   }, [logout, router]);
 
   const getPageTitle = useCallback(() => {
-    if (pathname === "/admin/dashboard") return "Dashboard";
-    if (pathname.includes("/products")) return "Products";
-    if (pathname.includes("/categories")) return "Categories";
-    if (pathname.includes("/orders")) return "Orders";
-    return "Dashboard";
+    if (pathname === "/admin/dashboard") return "Tableau de bord";
+    if (pathname.includes("/products")) return "Produits";
+    if (pathname.includes("/categories")) return "Catégories";
+    if (pathname.includes("/orders")) return "Commandes";
+    return "Tableau de bord";
   }, [pathname]);
 
   if (isChecking) return null;
@@ -86,7 +86,7 @@ export default function AdminDashboardLayout({
             <span className={styles.navIcon}>
               <LogOut size={18} strokeWidth={1.5} />
             </span>
-            Sign Out
+            Déconnexion
           </button>
         </div>
       </aside>
@@ -128,7 +128,7 @@ export default function AdminDashboardLayout({
             </button>
             <h1 className={styles.pageTitle}>{getPageTitle()}</h1>
           </div>
-          <span className={styles.adminBadge}>Administrator</span>
+          <span className={styles.adminBadge}>Administrateur</span>
         </header>
 
         <div className={styles.content}>{children}</div>

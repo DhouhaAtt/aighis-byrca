@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heart } from "lucide-react";
 
 import styles from "./ProductInfo.module.css";
+import { getLocalizedProductCopy } from "../../../lib/i18n/productCopy";
 import type { ProductDetail } from "../../../lib/productData";
 import { useWishlist } from "../../../context/WishlistContext";
 import { useLocale } from "../../../context/LocaleContext";
@@ -12,6 +13,7 @@ import VariantSelector from "./VariantSelector";
 import SizeSelector from "./SizeSelector";
 import AddToCart from "./AddToCart";
 import { discountPercent } from "../../../lib/pricing";
+import { localizeCategoryLabel } from "../../../lib/i18n/categoryLabel";
 
 interface Props {
   product: ProductDetail;
@@ -24,6 +26,8 @@ export default function ProductInfo({ product }: Props) {
   const { t } = useLocale();
 
   const liked = isLiked(product.id);
+  const localizedName = getLocalizedProductCopy(product.id, product.name, t)?.name ?? product.name;
+  const localizedCategory = localizeCategoryLabel(product.category, t.categories);
   const discount = discountPercent(product.price, product.originalPrice);
   const showSale = product.isOnSale && discount !== null;
 
@@ -31,7 +35,7 @@ export default function ProductInfo({ product }: Props) {
     <section className={styles.info}>
       <p className={styles.collection}>{product.collection}</p>
 
-      <h1 className={styles.title}>{product.name}</h1>
+      <h1 className={styles.title}>{localizedName}</h1>
 
       {showSale ? (
         <p className={styles.priceRow}>
@@ -43,7 +47,7 @@ export default function ProductInfo({ product }: Props) {
         <p className={styles.price}>{product.price}</p>
       )}
 
-      <p className={styles.category}>{product.category}</p>
+      <p className={styles.category}>{localizedCategory}</p>
 
       {product.colors.length > 0 && (
         <VariantSelector
@@ -66,7 +70,7 @@ export default function ProductInfo({ product }: Props) {
         <AddToCart
           product={{
             id: product.id,
-            name: product.name,
+            name: localizedName,
             price: product.price,
             category: product.category,
             image: product.images[0],
@@ -80,7 +84,7 @@ export default function ProductInfo({ product }: Props) {
           onClick={() =>
             toggleItem({
               id: product.id,
-              name: product.name,
+              name: localizedName,
               price: product.price,
               category: product.category,
               image: product.images[0],
@@ -104,7 +108,9 @@ export default function ProductInfo({ product }: Props) {
       <div className={styles.meta}>
         <p className={styles.shipping}>{product.shipping}</p>
 
-        <p className={styles.code}>{t.productDetail.productCode}: {product.productCode}</p>
+        {product.productCode?.trim() && (
+          <p className={styles.code}>{t.productDetail.productCode}: {product.productCode.trim()}</p>
+        )}
       </div>
     </section>
   );

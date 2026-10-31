@@ -10,16 +10,17 @@ import Footer from "../components/Footer/Footer";
 import {
   questions,
   findBestOutfit,
-  getSlotLabel,
   type OutfitSlot,
   type QuizSelections,
 } from "../components/OutfitBuilder/outfitData";
 
 import styles from "./OutfitBuilderPage.module.css";
+import { useLocale } from "../context/LocaleContext";
 
 const TOTAL_STEPS = questions.length;
 
 export default function OutfitBuilderPage() {
+  const { t } = useLocale();
   const [step, setStep] = useState(0);
   const [selections, setSelections] = useState<QuizSelections>({
     event: null,
@@ -90,12 +91,12 @@ export default function OutfitBuilderPage() {
       {/* Simple PageHeader equivalent */}
       <section className={styles.header}>
         <h1>
-          {showResults ? "Your Curated Outfit" : "Prepare Your Outfit"}
+          {showResults ? t.outfitBuilder.resultsTitle : t.outfitBuilder.title}
         </h1>
         <p>
           {showResults
-            ? "A complete look crafted just for you"
-            : "Answer a few questions and let us style you"}
+            ? t.outfitBuilder.resultsSubtitle
+            : t.outfitBuilder.subtitle}
         </p>
       </section>
 
@@ -121,9 +122,9 @@ export default function OutfitBuilderPage() {
             {/* STEP */}
             <div className={styles.step} key={step}>
               <p className={styles.stepLabel}>
-                Step {step + 1} of {TOTAL_STEPS}
+                {t.outfitBuilder.step} {step + 1} {t.outfitBuilder.of} {TOTAL_STEPS}
               </p>
-              <h2 className={styles.stepQuestion}>{current.question}</h2>
+              <h2 className={styles.stepQuestion}>{t.outfitBuilder.questions[step]}</h2>
 
               {current.id === "colors" ? (
                 <div className={styles.colorsGrid}>
@@ -146,8 +147,8 @@ export default function OutfitBuilderPage() {
                         onClick={() => handleSelect(opt.value)}
                         className={`${styles.colorSwatch} ${selected ? styles.colorSwatchSelected : ""}`}
                         style={{ background: bg, borderColor: opt.value === "white" ? "#ddd" : undefined }}
-                        title={opt.label}
-                        aria-label={opt.label}
+                        title={t.outfitBuilder.options[opt.value] ?? opt.label}
+                        aria-label={t.outfitBuilder.options[opt.value] ?? opt.label}
                       >
                         {selected && (
                           <Check
@@ -169,7 +170,7 @@ export default function OutfitBuilderPage() {
                       onClick={() => handleSelect(opt.value)}
                       className={`${styles.sizeCard} ${isSelected(opt.value) ? styles.sizeCardSelected : ""}`}
                     >
-                      {opt.label}
+                      {t.outfitBuilder.options[opt.value] ?? opt.label}
                     </button>
                   ))}
                 </div>
@@ -182,7 +183,7 @@ export default function OutfitBuilderPage() {
                       className={`${styles.optionCard} ${isSelected(opt.value) ? styles.optionCardSelected : ""}`}
                     >
                       {opt.emoji && <span className={styles.optionEmoji}>{opt.emoji}</span>}
-                      <span className={styles.optionLabel}>{opt.label}</span>
+                      <span className={styles.optionLabel}>{t.outfitBuilder.options[opt.value] ?? opt.label}</span>
                     </button>
                   ))}
                 </div>
@@ -194,7 +195,7 @@ export default function OutfitBuilderPage() {
               {step > 0 ? (
                 <button onClick={handleBack} className={styles.backBtn}>
                   <ArrowLeft size={14} strokeWidth={1.5} />
-                  Back
+                  {t.outfitBuilder.back}
                 </button>
               ) : (
                 <div />
@@ -206,13 +207,13 @@ export default function OutfitBuilderPage() {
               >
                 {step < TOTAL_STEPS - 1 ? (
                   <>
-                    Next
+                    {t.outfitBuilder.next}
                     <ArrowRight size={14} strokeWidth={1.5} />
                   </>
                 ) : (
                   <>
                     <Sparkles size={14} strokeWidth={1.5} />
-                    Reveal My Outfit
+                    {t.outfitBuilder.reveal}
                   </>
                 )}
               </button>
@@ -222,8 +223,8 @@ export default function OutfitBuilderPage() {
           /* ===================== RESULTS ===================== */
           <div className={styles.results} key={key}>
             <div className={styles.resultsHeader}>
-              <p className={styles.resultsLabel}>Your personalized look</p>
-              <h2 className={styles.resultsTitle}>A Complete Ensemble</h2>
+              <p className={styles.resultsLabel}>{t.outfitBuilder.resultsEyebrow}</p>
+              <h2 className={styles.resultsTitle}>{t.outfitBuilder.resultsTitle}</h2>
               <p className={styles.resultsSubtitle}>
                 Every piece selected with care to match your preferences
               </p>
@@ -256,11 +257,11 @@ export default function OutfitBuilderPage() {
                             textTransform: "uppercase",
                           }}
                         >
-                          Not included
+                          {t.outfitBuilder.notIncluded}
                         </div>
                       )}
                     </div>
-                    <span className={styles.resultSlot}>{getSlotLabel(slot)}</span>
+                    <span className={styles.resultSlot}>{t.outfitBuilder.slots[slot]}</span>
                     {item && (
                       <>
                         <Link
@@ -280,11 +281,11 @@ export default function OutfitBuilderPage() {
             <div className={styles.resultsActions}>
               <button onClick={handleRetake} className={styles.retakeBtn}>
                 <RefreshCw size={14} strokeWidth={1.5} />
-                Start Over
+                {t.outfitBuilder.restart}
               </button>
               <Link href="/products" className={styles.shopBtn}>
                 <Sparkles size={14} strokeWidth={1.5} />
-                Shop This Look
+                {t.outfitBuilder.shop}
               </Link>
             </div>
           </div>

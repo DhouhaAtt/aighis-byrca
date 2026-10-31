@@ -4,6 +4,7 @@ import styles from "./AddToCart.module.css";
 import { useCart } from "../../../context/CartContext";
 import { useLocale } from "../../../context/LocaleContext";
 import type { Product } from "../../../components/NewArrivals/products";
+import { useState } from "react";
 
 interface Props {
   product: Product;
@@ -20,10 +21,14 @@ export default function AddToCart({
 }: Props) {
   const { addItem } = useCart();
   const { t } = useLocale();
+  const [notice, setNotice] = useState("");
 
   return (
-    <button onClick={() => addItem(product, size, color, hex)} className={styles.button}>
-      {t.productDetail.addToCart}
-    </button>
+    <>
+      <button onClick={() => { addItem(product, size, color, hex); setNotice(t.cart.addedSuccessfully); window.setTimeout(() => setNotice(""), 2500); }} className={styles.button}>
+        {t.productDetail.addToCart}
+      </button>
+      {notice && <span role="status" aria-live="polite">{notice}</span>}
+    </>
   );
 }

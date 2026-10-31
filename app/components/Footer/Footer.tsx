@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import styles from "./Footer.module.css";
 
 import { BRAND_NAME } from "../../lib/constants";
@@ -8,6 +9,23 @@ import { useLocale } from "../../context/LocaleContext";
 
 export default function Footer() {
   const { t, locale, setLocale } = useLocale();
+  const [city, setCity] = useState("");
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterNotice, setNewsletterNotice] = useState("");
+
+  const searchStores = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = encodeURIComponent(`Aighis Byrca ${city.trim()}`);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank", "noopener,noreferrer");
+  };
+
+  const requestNewsletter = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const subject = encodeURIComponent("Newsletter subscription request");
+    const body = encodeURIComponent(`Please subscribe this email address to the Aighis Byrca newsletter: ${newsletterEmail}`);
+    window.location.href = `mailto:contact@aighisbyrca.com?subject=${subject}&body=${body}`;
+    setNewsletterNotice(t.footer.newsletterDraftNotice);
+  };
 
   return (
     <footer className={styles.footer}>
@@ -21,13 +39,16 @@ export default function Footer() {
 
           <p className={styles.description}>{t.footer.storeLocatorDesc}</p>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={searchStores}>
             <input
               type="text"
               placeholder={t.footer.storeLocatorPlaceholder}
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              required
             />
 
-            <button>{t.footer.search}</button>
+            <button type="submit">{t.footer.search}</button>
           </form>
         </div>
 
@@ -46,17 +67,22 @@ export default function Footer() {
 
           <p className={styles.description}>{t.footer.subscribeDesc}</p>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={requestNewsletter}>
             <input
               type="email"
               placeholder={t.footer.emailPlaceholder}
+              value={newsletterEmail}
+              onChange={(event) => setNewsletterEmail(event.target.value)}
+              required
             />
 
-            <button>{t.footer.confirm}</button>
+            <button type="submit">{t.footer.confirm}</button>
           </form>
 
+          {newsletterNotice && <p role="status" className={styles.description}>{newsletterNotice}</p>}
+
           <label className={styles.checkbox}>
-            <input type="checkbox" />
+            <input type="checkbox" required />
 
             <span>{t.footer.privacyPolicy}</span>
           </label>

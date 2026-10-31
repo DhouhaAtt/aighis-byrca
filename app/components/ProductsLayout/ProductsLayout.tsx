@@ -8,5 +8,5 @@ interface Props {
 }
 
 export default function ProductsLayout({ products }: Props) {
-  return <ProductFilterLayout products={products} basePath="/products" />;
+  return <ProductFilterLayout products={products} />;
 }

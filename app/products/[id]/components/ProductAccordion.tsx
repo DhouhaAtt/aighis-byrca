@@ -6,6 +6,7 @@ import { ChevronDown } from "lucide-react";
 import styles from "./ProductAccordion.module.css";
 import type { ProductDetail } from "../../../lib/productData";
 import { useLocale } from "../../../context/LocaleContext";
+import { getLocalizedProductCopy } from "../../../lib/i18n/productCopy";
 
 interface Props {
   product: ProductDetail;
@@ -14,6 +15,11 @@ interface Props {
 export default function ProductAccordion({ product }: Props) {
   const [open, setOpen] = useState<string | null>("description");
   const { t } = useLocale();
+  const localizedCopy = getLocalizedProductCopy(product.id, product.name, t);
+  const description = localizedCopy?.description ?? product.description;
+  const composition = localizedCopy?.composition ?? product.composition;
+  const fit = localizedCopy?.fit ?? product.fit;
+  const careInstructions = localizedCopy?.care ?? product.careInstructions;
 
   const toggle = (section: string) => {
     setOpen((prev) => (prev === section ? null : section));
@@ -23,7 +29,7 @@ export default function ProductAccordion({ product }: Props) {
     {
       id: "description",
       title: t.productDetail.description,
-      content: <p className={styles.text}>{product.description}</p>,
+      content: <p className={styles.text}>{description}</p>,
     },
     {
       id: "details",
@@ -32,18 +38,20 @@ export default function ProductAccordion({ product }: Props) {
         <div className={styles.detailsGrid}>
           <div>
             <span className={styles.detailLabel}>{t.productDetail.composition}</span>
-            <p className={styles.detailText}>{product.composition}</p>
+            <p className={styles.detailText}>{composition}</p>
           </div>
 
           <div>
             <span className={styles.detailLabel}>{t.productDetail.fit}</span>
-            <p className={styles.detailText}>{product.fit}</p>
+            <p className={styles.detailText}>{fit}</p>
           </div>
 
-          <div>
-            <span className={styles.detailLabel}>{t.productDetail.productCode}</span>
-            <p className={styles.detailText}>{product.productCode}</p>
-          </div>
+          {product.productCode?.trim() && (
+            <div>
+              <span className={styles.detailLabel}>{t.productDetail.productCode}</span>
+              <p className={styles.detailText}>{product.productCode.trim()}</p>
+            </div>
+          )}
         </div>
       ),
     },
@@ -53,14 +61,14 @@ export default function ProductAccordion({ product }: Props) {
       content: (
         <div className={styles.careList}>
           <p className={styles.detailLabel}>{t.productDetail.composition}</p>
-          <p className={styles.detailText}>{product.composition}</p>
+          <p className={styles.detailText}>{composition}</p>
 
           <p className={styles.detailLabel} style={{ marginTop: 16 }}>
             {t.productDetail.careInstructions}
           </p>
 
           <ul className={styles.care}>
-            {product.careInstructions.map((instruction, idx) => (
+            {careInstructions.map((instruction, idx) => (
               <li key={idx} className={styles.careItem}>
                 {instruction}
               </li>
@@ -75,12 +83,12 @@ export default function ProductAccordion({ product }: Props) {
       content: (
         <div className={styles.shippingContent}>
           <p className={styles.detailLabel}>{t.productDetail.shipping}</p>
-          <p className={styles.detailText}>{product.shipping}</p>
+          <p className={styles.detailText}>{t.productDetail.shippingPolicy}</p>
 
           <p className={styles.detailLabel} style={{ marginTop: 16 }}>
             {t.productDetail.returns}
           </p>
-          <p className={styles.detailText}>{product.returns}</p>
+          <p className={styles.detailText}>{t.productDetail.returnsPolicy}</p>
         </div>
       ),
     },

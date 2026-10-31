@@ -9,6 +9,8 @@ import type { Product } from "../NewArrivals/products";
 import { useWishlist } from "../../context/WishlistContext";
 import { useLocale } from "../../context/LocaleContext";
 import { discountPercent } from "../../lib/pricing";
+import { localizeCategoryLabel } from "../../lib/i18n/categoryLabel";
+import { getLocalizedProductCopy } from "../../lib/i18n/productCopy";
 
 interface Props {
   product: Product;
@@ -17,6 +19,8 @@ interface Props {
 export default function ProductCard({ product }: Props) {
   const { isLiked, toggleItem } = useWishlist();
   const { t } = useLocale();
+  const localizedName = getLocalizedProductCopy(product.id, product.name, t)?.name ?? product.name;
+  const localizedCategory = localizeCategoryLabel(product.category, t.categories);
   const liked = isLiked(product.id);
   const discount = discountPercent(product.price, product.originalPrice);
   const showSale = product.isOnSale && discount !== null;
@@ -29,14 +33,14 @@ export default function ProductCard({ product }: Props) {
         <Link href={`/products/${product.id}`} className={styles.imageWrapper}>
           {/* Vertical Category */}
 
-          <span className={styles.category}>{product.category}</span>
+          <span className={styles.category}>{localizedCategory}</span>
 
           {/* Product Image */}
 
           <div className={styles.imageContainer}>
             <Image
               src={product.image}
-              alt={product.name}
+              alt={localizedName}
               width={800}
               height={800}
               className={styles.image}
@@ -69,7 +73,7 @@ export default function ProductCard({ product }: Props) {
       {/* INFO */}
 
       <Link href={`/products/${product.id}`} className={styles.info}>
-        <h3>{product.name}</h3>
+        <h3>{localizedName}</h3>
 
         <p className={styles.priceRow}>
           {showSale ? (

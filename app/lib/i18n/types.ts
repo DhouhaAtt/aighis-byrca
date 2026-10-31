@@ -20,8 +20,38 @@ export interface Translations {
     men: string;
     shopNow: string;
     discover: string;
+    noNewArrivals: string;
+    outfitEyebrow: string;
+    outfitTitle: string;
+    outfitDescription: string;
+    outfitCta: string;
+    aboutTitle: string;
+    aboutParagraphs: string[];
+  };
+  search: { placeholder: string; browseCategories: string; noResults: string };
+  filters: {
+    filters: string; all: string; gender: string; genders: Record<string, string>; price: string; size: string; color: string;
+    allColors: string; clear: string; noProducts: string; product: string; products: string;
+  };
+  contactPage: {
+    subtitle: string; thankYou: string; received: string; backHome: string;
+    title: string; description: string; name: string; yourName: string;
+    email: string; yourEmail: string; message: string; messagePlaceholder: string; send: string;
+    sending: string; sendError: string;
+  };
+  outfitBuilder: {
+    title: string; subtitle: string; resultsTitle: string; resultsSubtitle: string;
+    resultsEyebrow: string; step: string; of: string; back: string; next: string;
+    reveal: string; notIncluded: string; restart: string; shop: string;
+    questions: string[]; options: Record<string, string>;
+    slots: Record<string, string>;
   };
   categories: {
+    fashion: string;
+    sale: string;
+    world: string;
+    casa: string;
+    newCollection: string;
     tops: string;
     bottoms: string;
     underwear: string;
@@ -56,6 +86,8 @@ export interface Translations {
     shippingReturns: string;
     shipping: string;
     returns: string;
+    shippingPolicy: string;
+    returnsPolicy: string;
   };
   wishlist: {
     title: string;
@@ -73,6 +105,8 @@ export interface Translations {
     items: string;
     size: string;
     removeItem: string;
+    addedSuccessfully: string;
+    removedSuccessfully: string;
     orderSummary: string;
     subtotal: string;
     shipping: string;
@@ -111,6 +145,8 @@ export interface Translations {
     successMessage: string;
     backToShop: string;
     emptyCart: string;
+    errorGeneric: string;
+    stockError: string;
   };
   womenPage: {
     title: string;
@@ -140,6 +176,7 @@ export interface Translations {
     tunisia: string;
     english: string;
     french: string;
+    newsletterDraftNotice: string;
     copyright: string;
   };
   orderTracking: {
@@ -171,6 +208,7 @@ export interface Translations {
       onTheWay: string;
       delivered: string;
       notPaid: string;
+      cancelled: string;
       confirmed: string;
       processing: string;
     };

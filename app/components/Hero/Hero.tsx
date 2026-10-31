@@ -1,7 +1,6 @@
 import styles from "./Hero.module.css";
 
 import HeroImage from "../HeroImage/HeroImage";
-import HeroCenter from "../HeroCenter/HeroCenter";
 
 export default function Hero() {
   return (
