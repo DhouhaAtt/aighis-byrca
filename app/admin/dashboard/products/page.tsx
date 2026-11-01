@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Edit3, Trash2, X, Upload, Check } from "lucide-react";
 import styles from "../AdminTable.module.css";
+import { formatTndPrice } from "../../../lib/formatPrice";
 
 interface Product {
   id: number;
@@ -15,6 +16,7 @@ interface Product {
   gender: string | null;
   isOnSale: boolean;
   isNewArrival: boolean;
+  isPremium?: boolean;
   stock: number;
   tags: string | null;
   collection: string | null;
@@ -39,23 +41,17 @@ interface Category {
 interface ColorOption {
   name: string;
   hex: string;
+  image?: string | null;
 }
 
 interface VariantRow {
-  id?: number;
-  key: string;
   size: string;
   color: string;
   hex: string | null;
-  stock: number;
 }
 
 const DEFAULT_SIZE = "One Size";
 const DEFAULT_COLOR = "Default";
-
-function variantKey(size: string, color: string): string {
-  return `${size.trim().toLowerCase()}||${color.trim().toLowerCase()}`;
-}
 
 /** Cross product of selected sizes and colors, falling back to One Size/Default. */
 function buildVariantRows(sizes: string[], colors: ColorOption[]): VariantRow[] {
@@ -65,11 +61,9 @@ function buildVariantRows(sizes: string[], colors: ColorOption[]): VariantRow[] 
 
   return sizeList.flatMap((size) =>
     colorList.map((color) => ({
-      key: variantKey(size, color.name),
       size,
       color: color.name,
       hex: color.hex || null,
-      stock: 0,
     }))
   );
 }
@@ -83,6 +77,7 @@ const emptyForm = {
   gender: "",
   isOnSale: false,
   isNewArrival: false,
+  isPremium: false,
   stock: 0,
   tags: "",
   collection: "",
@@ -118,16 +113,12 @@ const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
 const COLOR_PALETTE: ColorOption[] = [
   { name: "Black", hex: "#111111" },
   { name: "White", hex: "#FFFFFF" },
-  { name: "Ivory", hex: "#F5F0E8" },
   { name: "Cream", hex: "#EFE3D0" },
   { name: "Beige", hex: "#D9C7B0" },
-  { name: "Taupe", hex: "#8C7B6B" },
   { name: "Brown", hex: "#6F4E37" },
   { name: "Camel", hex: "#B98B5E" },
   { name: "Grey", hex: "#808080" },
-  { name: "Charcoal", hex: "#3A3A3A" },
   { name: "Navy", hex: "#1B2A4A" },
-  { name: "Denim", hex: "#4A6FA5" },
   { name: "Blue", hex: "#2E5EAA" },
   { name: "Sky", hex: "#A9C9E8" },
   { name: "Lilac", hex: "#B9A3D9" },
@@ -137,14 +128,11 @@ const COLOR_PALETTE: ColorOption[] = [
   { name: "Red", hex: "#C0392B" },
   { name: "Burgundy", hex: "#6E1E2E" },
   { name: "Orange", hex: "#E07A3F" },
-  { name: "Terracotta", hex: "#C4643C" },
   { name: "Yellow", hex: "#F2C94C" },
   { name: "Mustard", hex: "#D9A441" },
   { name: "Olive", hex: "#6B7A4F" },
   { name: "Green", hex: "#3E6B4F" },
-  { name: "Emerald", hex: "#1F6F54" },
   { name: "Mint", hex: "#A8D5BA" },
-  { name: "Teal", hex: "#2F6F6B" },
 ];
 
 function isLightColor(hex: string): boolean {
@@ -175,7 +163,11 @@ function parseColorsValue(value: string | null): ColorOption[] {
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter((c): c is ColorOption => Boolean(c) && typeof c === "object" && "hex" in c)
-      .map((c) => ({ name: String(c.name ?? c.hex), hex: String(c.hex) }));
+      .map((c) => ({
+        name: String(c.name ?? c.hex),
+        hex: String(c.hex),
+        image: typeof c.image === "string" && c.image.trim() ? c.image : null,
+      }));
   } catch {
     return [];
   }
@@ -285,18 +277,20 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState("");
+  const [genderFilters, setGenderFilters] = useState<string[]>([]);
+  const [genderFilterOpen, setGenderFilterOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [page, setPage] = useState(1);
-  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
+  const [deleteTargets, setDeleteTargets] = useState<Product[] | null>(null);
+  const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
   const [snackbar, setSnackbar] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const extraImagesRef = useRef<HTMLInputElement>(null);
   const [extraUploading, setExtraUploading] = useState(false);
-  const [variantStock, setVariantStock] = useState<Record<string, number>>({});
-  const [variantsLoading, setVariantsLoading] = useState(false);
+  const [uploadingColorHex, setUploadingColorHex] = useState<string | null>(null);
 
   const showSnackbar = useCallback((type: "success" | "error", message: string) => {
     setSnackbar({ type, message });
@@ -320,12 +314,13 @@ export default function AdminProductsPage() {
     () =>
       products.filter(
         (p) =>
-          p.name.toLowerCase().includes(search.toLowerCase()) ||
-          (p.category?.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (p.gender ?? "").toLowerCase().includes(search.toLowerCase()) ||
-          (p.collection ?? "").toLowerCase().includes(search.toLowerCase())
+          (genderFilters.length === 0 || genderFilters.includes((p.gender ?? "").toLowerCase())) &&
+          (p.name.toLowerCase().includes(search.toLowerCase()) ||
+            (p.category?.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            (p.gender ?? "").toLowerCase().includes(search.toLowerCase()) ||
+            (p.collection ?? "").toLowerCase().includes(search.toLowerCase()))
       ),
-    [products, search]
+    [products, search, genderFilters]
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
@@ -333,38 +328,42 @@ export default function AdminProductsPage() {
     () => filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE),
     [filtered, page]
   );
+  const selectedProducts = useMemo(
+    () => selectedProductIds.map((id) => products.find((product) => product.id === id)).filter((product): product is Product => Boolean(product)),
+    [products, selectedProductIds]
+  );
 
-  useEffect(() => { setPage(1); }, [search]);
+  useEffect(() => { setPage(1); }, [search, genderFilters]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (deleteTarget) setDeleteTarget(null);
+        if (deleteTargets) setDeleteTargets(null);
         else if (showModal) setShowModal(false);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [showModal, deleteTarget]);
+  }, [showModal, deleteTargets]);
 
   const openAdd = useCallback(() => {
     setEditing(null);
     setForm(emptyForm);
-    setVariantStock({});
     setShowModal(true);
   }, []);
 
-  const openEdit = useCallback(async (product: Product) => {
+  const openEdit = useCallback((product: Product) => {
     setEditing(product);
     setForm({
       name: product.name,
-      price: product.price,
-      originalPrice: product.originalPrice ?? "",
+      price: product.price.replace(/\s*(?:TND|Tnd|DT)\s*$/i, "").replace(/\D/g, ""),
+      originalPrice: (product.originalPrice ?? "").replace(/\s*(?:TND|Tnd|DT)\s*$/i, "").replace(/\D/g, ""),
       image: product.image,
       hoverImage: product.hoverImage ?? "",
       gender: product.gender ?? "",
       isOnSale: product.isOnSale,
       isNewArrival: product.isNewArrival,
+      isPremium: Boolean(product.isPremium),
       stock: product.stock,
       tags: product.tags ?? "",
       collection: product.collection ?? "",
@@ -378,30 +377,7 @@ export default function AdminProductsPage() {
       categoryId: product.category?.id ? String(product.category.id) : "",
       extraImages: parseExtraImages(product.images),
     });
-    setVariantStock({});
-    setVariantsLoading(true);
     setShowModal(true);
-
-    try {
-      const res = await fetch(`/api/products/${product.id}`);
-      if (!res.ok) return;
-      const full = await res.json();
-      const variants: { size: string; color: string; stock: number }[] = Array.isArray(
-        full?.variants
-      )
-        ? full.variants
-        : [];
-      if (variants.length === 0) return;
-
-      setVariantStock(
-        Object.fromEntries(
-          variants.map((v) => [variantKey(v.size, v.color), Number(v.stock) || 0])
-        )
-      );
-    } catch {
-    } finally {
-      setVariantsLoading(false);
-    }
   }, []);
 
   const handleExtraUpload = useCallback(async (files: File[]) => {
@@ -447,6 +423,37 @@ export default function AdminProductsPage() {
     }));
   }, []);
 
+  const uploadColorImage = useCallback(async (hex: string, file: File) => {
+    setUploadingColorHex(hex);
+    try {
+      const [url] = await uploadFiles([file]);
+      if (!url) throw new Error("Upload failed");
+      setForm((current) => ({
+        ...current,
+        colors: current.colors.map((color) =>
+          color.hex.toLowerCase() === hex.toLowerCase()
+            ? { ...color, image: url }
+            : color
+        ),
+      }));
+    } catch {
+      showSnackbar("error", "Impossible d’ajouter la photo de cette couleur");
+    } finally {
+      setUploadingColorHex(null);
+    }
+  }, [showSnackbar]);
+
+  const removeColorImage = useCallback((hex: string) => {
+    setForm((current) => ({
+      ...current,
+      colors: current.colors.map((color) =>
+        color.hex.toLowerCase() === hex.toLowerCase()
+          ? { ...color, image: null }
+          : color
+      ),
+    }));
+  }, []);
+
   const allSizes = useMemo(() => {
     const custom = form.sizes.filter((s) => !SIZE_OPTIONS.includes(s));
     return [...SIZE_OPTIONS, ...custom];
@@ -456,32 +463,6 @@ export default function AdminProductsPage() {
     () => buildVariantRows(form.sizes, form.colors),
     [form.sizes, form.colors]
   );
-
-  const variantTotal = useMemo(
-    () => variantRows.reduce((sum, row) => sum + (variantStock[row.key] ?? 0), 0),
-    [variantRows, variantStock]
-  );
-
-  const setVariantStockValue = useCallback((key: string, value: number) => {
-    setVariantStock((prev) => ({
-      ...prev,
-      [key]: Number.isFinite(value) && value > 0 ? Math.trunc(value) : 0,
-    }));
-  }, []);
-
-  /** Spreads the currently displayed total evenly across every variant. */
-  const distributeTotal = useCallback(() => {
-    const perVariant = Math.floor(variantTotal / variantRows.length);
-    const remainder = variantTotal % variantRows.length;
-    setVariantStock((prev) =>
-      Object.fromEntries(
-        variantRows.map((row, index) => [
-          row.key,
-          perVariant + (index < remainder ? 1 : 0),
-        ])
-      )
-    );
-  }, [variantRows, variantTotal]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -495,6 +476,7 @@ export default function AdminProductsPage() {
         gender: form.gender || null,
         isOnSale: form.isOnSale,
         isNewArrival: form.isNewArrival,
+        isPremium: form.isPremium,
         stock: form.stock,
         tags: form.tags || null,
         collection: form.collection || null,
@@ -513,7 +495,7 @@ export default function AdminProductsPage() {
           size: row.size,
           color: row.color,
           hex: row.hex,
-          stock: variantStock[row.key] ?? 0,
+          stock: 0,
         })),
       };
 
@@ -525,7 +507,8 @@ export default function AdminProductsPage() {
             body: JSON.stringify(payload),
           });
           if (!res.ok) {
-            showSnackbar("error", "Y a un problème, impossible de mettre à jour");
+            const result = await res.json().catch(() => null);
+            showSnackbar("error", result?.error ?? "Impossible de mettre à jour");
             return;
           }
           const updated = await res.json();
@@ -551,30 +534,33 @@ export default function AdminProductsPage() {
         showSnackbar("error", "Y a un problème, impossible de sauvegarder");
       }
     },
-    [form, editing, showSnackbar, variantRows, variantStock]
+    [form, editing, showSnackbar, variantRows]
   );
 
   const confirmDelete = useCallback(async () => {
-    if (!deleteTarget) return;
+    if (!deleteTargets?.length) return;
     try {
-      const res = await fetch(`/api/products/${deleteTarget.id}`, { method: "DELETE" });
+      const res = await fetch("/api/products/bulk-delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: deleteTargets.map((product) => product.id) }) });
+      const result = await res.json();
       if (!res.ok) {
         showSnackbar("error", "Y a un problème, impossible de supprimer");
-        setDeleteTarget(null);
-        return;
+        throw new Error(result.error || "La suppression a échoué");
       }
       setProducts((prev) => {
-        const next = prev.filter((p) => p.id !== deleteTarget.id);
+        const deletedIds = new Set(deleteTargets.map((product) => product.id));
+        const next = prev.filter((p) => !deletedIds.has(p.id));
         const newTotalPages = Math.max(1, Math.ceil(next.length / PER_PAGE));
         if (page > newTotalPages) setPage(newTotalPages);
         return next;
       });
-      showSnackbar("success", "Produit supprimé avec succès");
-    } catch {
-      showSnackbar("error", "Y a un problème, impossible de supprimer");
+      const deletedIds = new Set(deleteTargets.map((product) => product.id));
+      setSelectedProductIds((current) => current.filter((id) => !deletedIds.has(id)));
+      showSnackbar("success", `${result.deletedCount} produit(s) supprimé(s) avec succès`);
+    } catch (error) {
+      showSnackbar("error", error instanceof Error ? error.message : "La suppression a échoué");
     }
-    setDeleteTarget(null);
-  }, [deleteTarget, showSnackbar, page]);
+    setDeleteTargets(null);
+  }, [deleteTargets, showSnackbar, page]);
 
   function renderPages() {
     return Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -615,15 +601,62 @@ export default function AdminProductsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button className={styles.addBtn} onClick={openAdd}>
-          Ajouter un produit
-        </button>
+        <div className={styles.toolbarActions}>
+          <div className={styles.genderFilter}>
+            <button
+              type="button"
+              className={styles.genderFilterButton}
+              aria-label="Filtrer par genre"
+              aria-expanded={genderFilterOpen}
+              onClick={() => setGenderFilterOpen((open) => !open)}
+            >
+              {genderFilters.length === 0
+                ? "Tous les genres"
+                : genderFilters.map((gender) => gender === "women" ? "Femmes" : gender === "men" ? "Hommes" : "Mixte").join(", ")}
+            </button>
+            {genderFilterOpen && (
+              <div className={styles.genderFilterMenu} role="group" aria-label="Choisir les genres">
+                <label className={styles.genderFilterOption}>
+                  <input type="checkbox" checked={genderFilters.length === 0} onChange={() => setGenderFilters([])} />
+                  Tous les genres
+                </label>
+                {[
+                  ["women", "Femmes"],
+                  ["men", "Hommes"],
+                  ["unisex", "Mixte"],
+                ].map(([value, label]) => (
+                  <label className={styles.genderFilterOption} key={value}>
+                    <input
+                      type="checkbox"
+                      checked={genderFilters.includes(value)}
+                      onChange={() => setGenderFilters((current) =>
+                        current.includes(value) ? current.filter((gender) => gender !== value) : [...current, value]
+                      )}
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className={styles.addBtn} onClick={openAdd}>
+            Ajouter un produit
+          </button>
+        </div>
       </div>
+      {selectedProducts.length >= 1 && (
+        <div className={styles.selectionToolbar}>
+          <span>{selectedProducts.length} produits sélectionnés</span>
+          <button className={styles.bulkDeleteButton} onClick={() => setDeleteTargets(selectedProducts)}>Supprimer la sélection</button>
+          <button className={styles.selectionClear} onClick={() => setSelectedProductIds([])}>Effacer la sélection</button>
+        </div>
+      )}
 
       <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead>
           <tr>
+            <th aria-label="Sélectionner" />
             <th>Produit</th>
             <th>Prix</th>
             <th>Catégorie</th>
@@ -637,15 +670,16 @@ export default function AdminProductsPage() {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Chargement…</td>
+              <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "#888" }}>Chargement…</td>
             </tr>
           ) : paginated.length === 0 ? (
             <tr>
-              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>Aucun produit trouvé</td>
+              <td colSpan={9} style={{ padding: 40, textAlign: "center", color: "#888" }}>Aucun produit trouvé</td>
             </tr>
           ) : (
             paginated.map((product) => (
               <tr key={product.id}>
+                <td><input aria-label={`Sélectionner ${product.name}`} type="checkbox" checked={selectedProductIds.includes(product.id)} onChange={(event) => setSelectedProductIds((current) => event.target.checked ? [...current, product.id] : current.filter((id) => id !== product.id))} /></td>
                 <td>
                   <div className={styles.productCell}>
                     <Image src={getSafeProductImage(product.image)} alt={product.name} width={44} height={57} className={styles.productThumb} />
@@ -653,9 +687,9 @@ export default function AdminProductsPage() {
                   </div>
                 </td>
                 <td>
-                  <div>{product.price}</div>
+                  <div>{formatTndPrice(product.price)}</div>
                   {product.originalPrice && (
-                    <div style={{ color: "#888", fontSize: 11, textDecoration: "line-through" }}>{product.originalPrice}</div>
+                    <div style={{ color: "#888", fontSize: 11, textDecoration: "line-through" }}>{formatTndPrice(product.originalPrice)}</div>
                   )}
                 </td>
                 <td>{product.category?.name ?? "-"}</td>
@@ -679,7 +713,7 @@ export default function AdminProductsPage() {
                 <td>
                   <div className={styles.actionBtns}>
                     <button className={styles.actionBtn} onClick={() => openEdit(product)}><Edit3 size={15} strokeWidth={1.5} /></button>
-                    <button className={styles.actionBtn} onClick={() => setDeleteTarget(product)}><Trash2 size={15} strokeWidth={1.5} /></button>
+                    <button className={styles.actionBtn} onClick={() => setDeleteTargets([product])}><Trash2 size={15} strokeWidth={1.5} /></button>
                   </div>
                 </td>
               </tr>
@@ -715,12 +749,12 @@ export default function AdminProductsPage() {
                 </div>
                 <div className={styles.row}>
                   <div className={styles.field}>
-                    <label className={styles.label}>Prix</label>
-                    <input className={styles.input} value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} required />
+                    <label className={styles.label}>Prix (TND)</label>
+                    <input className={styles.input} type="text" inputMode="numeric" pattern="[0-9]+" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value.replace(/\D/g, "") }))} required />
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>Prix initial</label>
-                    <input className={styles.input} value={form.originalPrice} onChange={(e) => setForm((f) => ({ ...f, originalPrice: e.target.value }))} placeholder="Optional" />
+                    <label className={styles.label}>Prix initial (TND)</label>
+                    <input className={styles.input} type="text" inputMode="numeric" pattern="[0-9]*" value={form.originalPrice} onChange={(e) => setForm((f) => ({ ...f, originalPrice: e.target.value.replace(/\D/g, "") }))} placeholder="Optional" />
                   </div>
                 </div>
 
@@ -782,6 +816,7 @@ export default function AdminProductsPage() {
                       <option value="">-</option>
                       <option value="women">Femme</option>
                       <option value="men">Homme</option>
+                      <option value="unisex">Mixte / Unisexe</option>
                     </select>
                   </div>
                   <div className={styles.field}>
@@ -800,16 +835,17 @@ export default function AdminProductsPage() {
                     <input className={styles.input} value={form.collection} onChange={(e) => setForm((f) => ({ ...f, collection: e.target.value }))} placeholder="e.g. Summer 2025" />
                   </div>
                   <div className={styles.field}>
-                    <label className={styles.label}>Stock</label>
+                    <label className={styles.label}>Stock total du produit</label>
                     <input
                       className={styles.input}
                       type="number"
-                      value={variantTotal}
-                      readOnly
-                      title="Total computed from the per-variant stock below"
+                      min="0"
+                      step="1"
+                      value={form.stock}
+                      onChange={(e) => setForm((f) => ({ ...f, stock: Math.max(0, Math.trunc(Number(e.target.value) || 0)) }))}
                     />
                     <span className={styles.hint}>
-                      Automatically summed from the size / colour stock below.
+                      Stock total pour le produit, indépendamment de la taille et de la couleur.
                     </span>
                   </div>
                 </div>
@@ -911,85 +947,62 @@ export default function AdminProductsPage() {
                       ))}
                     </div>
                   )}
+                  {form.colors.length > 0 && (
+                    <div className={styles.colorImageList}>
+                      <div>
+                        <p className={styles.colorImageTitle}>Photos par couleur</p>
+                        <p className={styles.hint}>
+                          Facultatif : ajoutez une photo pour l’afficher quand cette couleur est choisie.
+                        </p>
+                      </div>
+                      {form.colors.map((color) => {
+                        const inputId = `color-image-${color.hex.replace("#", "")}`;
+                        const uploading = uploadingColorHex === color.hex;
+                        return (
+                          <div className={styles.colorImageRow} key={color.hex}>
+                            {color.image ? (
+                              <img className={styles.colorImagePreview} src={color.image} alt={`Photo ${color.name}`} />
+                            ) : (
+                              <span className={styles.colorImagePlaceholder} style={{ background: color.hex }} />
+                            )}
+                            <div className={styles.colorImageDetails}>
+                              <span className={styles.colorImageName}>{color.name}</span>
+                              <span className={styles.hint}>{color.image ? "Photo ajoutée" : "Photo à ajouter"}</span>
+                            </div>
+                            <label className={styles.colorImageAction} htmlFor={inputId}>
+                              {uploading ? "Envoi…" : color.image ? "Remplacer" : "Ajouter une photo"}
+                              <input
+                                id={inputId}
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                disabled={uploadingColorHex !== null}
+                                onChange={(event) => {
+                                  const file = event.target.files?.[0];
+                                  if (file) void uploadColorImage(color.hex, file);
+                                  event.currentTarget.value = "";
+                                }}
+                              />
+                            </label>
+                            {color.image && (
+                              <button
+                                type="button"
+                                className={styles.colorImageRemove}
+                                onClick={() => removeColorImage(color.hex)}
+                                aria-label={`Supprimer la photo ${color.name}`}
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                   {form.colors.length === 0 && (
                     <span className={styles.hint}>Aucune couleur sélectionnée.</span>
                   )}
                 </div>
 
-                <div className={styles.field}>
-                  <label className={styles.label}>Stock par taille et couleur</label>
-                  {variantsLoading ? (
-                    <span className={styles.hint}>Chargement du stock…</span>
-                  ) : (
-                    <>
-                      <table className={styles.variantTable}>
-                        <thead>
-                          <tr>
-                            <th>Taille</th>
-                            <th>Colour</th>
-                            <th>Stock</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {variantRows.map((row) => (
-                            <tr key={row.key}>
-                              <td>{row.size}</td>
-                              <td>
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                                  {row.hex && (
-                                    <span
-                                      className={styles.swatchDot}
-                                      style={{ background: row.hex, width: 12, height: 12 }}
-                                    />
-                                  )}
-                                  {row.color}
-                                </span>
-                              </td>
-                              <td>
-                                <input
-                                  className={styles.input}
-                                  type="number"
-                                  min="0"
-                                  style={{ height: 34, maxWidth: 90 }}
-                                  value={variantStock[row.key] ?? 0}
-                                  onChange={(e) =>
-                                    setVariantStockValue(row.key, Number(e.target.value))
-                                  }
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginTop: 10,
-                        }}
-                      >
-                        <span className={styles.hint}>
-                          {variantRows.length} variant{variantRows.length !== 1 ? "s" : ""} ·{" "}
-                          {variantTotal} unit{variantTotal !== 1 ? "s" : ""} total
-                        </span>
-                        {variantRows.length > 1 && (
-                          <button
-                            type="button"
-                            className={styles.selectedTagRemove}
-                            style={{ fontSize: 11, textDecoration: "underline" }}
-                            onClick={distributeTotal}
-                          >
-                            Répartir le stock équitablement
-                          </button>
-                        )}
-                      </div>
-                      <span className={styles.hint}>
-                        Les clients ne peuvent commander que les tailles et couleurs disponibles.
-                      </span>
-                    </>
-                  )}
-                </div>
                 {/* Care instructions: hidden from the form on purpose. The field stays in
                     form state so existing values are round-tripped untouched; uncomment to
                     edit them again. */}
@@ -1011,6 +1024,10 @@ export default function AdminProductsPage() {
                   <input type="checkbox" checked={form.isNewArrival} onChange={(e) => setForm((f) => ({ ...f, isNewArrival: e.target.checked }))} />
                   Afficher dans les nouveautés (accueil)
                 </label>
+                <label className={styles.checkboxLabel}>
+                  <input type="checkbox" checked={form.isPremium} onChange={(e) => setForm((f) => ({ ...f, isPremium: e.target.checked }))} />
+                  Collection Premium
+                </label>
               </div>
               <div className={styles.modalFooter} style={{ gap: 12 }}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Annuler</button>
@@ -1021,21 +1038,22 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
+      {deleteTargets && (
+        <div className={styles.overlay} onClick={() => setDeleteTargets(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>Confirmer la suppression</h3>
-              <button className={styles.modalClose} onClick={() => setDeleteTarget(null)}><X size={18} strokeWidth={1.5} /></button>
+              <button className={styles.modalClose} onClick={() => setDeleteTargets(null)}><X size={18} strokeWidth={1.5} /></button>
             </div>
             <div className={styles.modalBody}>
               <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
-                Voulez-vous vraiment supprimer <strong>{deleteTarget.name}</strong> ? Cette action est irréversible.
+                Voulez-vous vraiment supprimer {deleteTargets.length === 1 ? <><strong>{deleteTargets[0].name}</strong> ?</> : <><strong>{deleteTargets.length} produits</strong> ?</>} Cette action est irréversible. Les historiques de commande seront conservés.
               </p>
+              {deleteTargets.length > 1 && <ul className={styles.deleteList}>{deleteTargets.map((product) => <li key={product.id}>{product.name}</li>)}</ul>}
             </div>
             <div className={styles.modalFooter} style={{ gap: 12 }}>
-              <button className={styles.cancelBtn} onClick={() => setDeleteTarget(null)}>Annuler</button>
-              <button className={styles.saveBtn} style={{ background: "#c62828" }} onClick={confirmDelete}>Supprimer</button>
+              <button className={styles.cancelBtn} onClick={() => setDeleteTargets(null)}>Annuler</button>
+              <button className={styles.saveBtn} style={{ background: "#c62828" }} onClick={confirmDelete}>Supprimer {deleteTargets.length > 1 ? `(${deleteTargets.length})` : ""}</button>
             </div>
           </div>
         </div>

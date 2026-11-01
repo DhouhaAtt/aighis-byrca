@@ -61,6 +61,7 @@ export function getFallbackRows(): ProductRow[] {
       gender: product.gender ?? null,
       isOnSale: Boolean(product.isOnSale),
       isNewArrival: true,
+      isPremium: Boolean(product.isPremium),
       stock: DEFAULT_STOCK,
       tags: toJson(product.tags ?? []),
       collection: detail?.collection ?? null,

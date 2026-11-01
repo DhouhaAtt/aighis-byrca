@@ -96,6 +96,7 @@ export const ProductScalarFieldEnum = {
   gender: 'gender',
   isOnSale: 'isOnSale',
   isNewArrival: 'isNewArrival',
+  isPremium: 'isPremium',
   stock: 'stock',
   tags: 'tags',
   collection: 'collection',

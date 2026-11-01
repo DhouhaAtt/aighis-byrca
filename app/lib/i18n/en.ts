@@ -6,7 +6,7 @@ const en: Translations = {
     tagline: "Luxury Fashion",
   },
   nav: {
-    top: ["Fashion", "Sale", "Casa", "World", "MY AB"],
+    top: ["Fashion", "Sale", "World", "MY AB"],
     center: [
       "SUMMER COLLECTION",
       "GIFTS",
@@ -41,8 +41,8 @@ const en: Translations = {
     ],
   },
   search: { placeholder: "Search by category or product title...", browseCategories: "Browse by Category", noResults: "No results found" },
-  filters: { filters: "Filters", all: "All", gender: "Gender", genders: { women: "Women", men: "Men", unisex: "Unisex" }, price: "Price", size: "Size", color: "Color", allColors: "All Colors", clear: "Clear All Filters", noProducts: "No products match your filters.", product: "product", products: "products" },
-  contactPage: { subtitle: "Get in touch with us", thankYou: "Thank You", received: "Your message has been sent. We will get back to you shortly.", backHome: "Back to Home", title: "We'd love to hear from you", description: "Whether you have a question about our collections, need styling advice, or simply want to share your thoughts — we're here for you.", name: "Name", yourName: "Your name", email: "Email", yourEmail: "Your email", message: "Message", messagePlaceholder: "Write your message...", send: "Send Message", sending: "Sending…", sendError: "We couldn't send your message right now. Please try again or email contact@aighisbyrca.com." },
+  filters: { filters: "Filters", all: "All", gender: "Gender", genders: { women: "Women", men: "Men", unisex: "Unisex" }, price: "Price", size: "Size", color: "Color", allColors: "All Colors", clear: "Clear All Filters", resetPrice: "Reset price", noProducts: "No products match your filters.", product: "product", products: "products" },
+  contactPage: { subtitle: "Get in touch with us", thankYou: "Thank You", received: "Your message has been sent. We will get back to you shortly.", backHome: "Back to Home", title: "We'd love to hear from you", description: "Whether you have a question about our collections, need styling advice, or simply want to share your thoughts — we're here for you.", name: "Name", yourName: "Your name", email: "Email", yourEmail: "Your email", message: "Message", messagePlaceholder: "Write your message...", send: "Send Message", sending: "Sending…", sendError: "We couldn't send your message right now. Please try again or email aighisbyrca@gmail.com." },
   outfitBuilder: {
     title: "Prepare Your Outfit", subtitle: "Answer a few questions and let us style you",
     resultsTitle: "Your Curated Outfit", resultsSubtitle: "A complete look crafted just for you", resultsEyebrow: "Your personalized look",
@@ -188,7 +188,8 @@ const en: Translations = {
     returns: "RETURNS",
     legalArea: "LEGAL AREA",
     contact: "CONTACT",
-    followUs: "FOLLOW US",
+    followUs: "FOLLOW US!",
+    emailUs: "OR SEND US AN EMAIL!",
     countryLanguage: "COUNTRY & LANGUAGE",
     tunisia: "Tunisia",
     english: "English",

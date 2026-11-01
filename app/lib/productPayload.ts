@@ -37,8 +37,13 @@ export function isValidProductPayload(
   body: Record<string, unknown>
 ): boolean {
   return Boolean(
-    toText(body.name) && toText(body.price) && toText(body.image)
+    toText(body.name) && isDigitsOnlyPrice(body.price) && toText(body.image) &&
+    (body.originalPrice == null || body.originalPrice === "" || isDigitsOnlyPrice(body.originalPrice))
   );
+}
+
+export function isDigitsOnlyPrice(value: unknown): value is string {
+  return typeof value === "string" && /^\d+$/.test(value.trim());
 }
 
 export interface VariantPayload {
@@ -88,6 +93,7 @@ export function toCreateProductInput(
     gender: toText(body.gender)?.toLowerCase() ?? null,
     isOnSale: toBoolean(body.isOnSale),
     isNewArrival: toBoolean(body.isNewArrival),
+    isPremium: toBoolean(body.isPremium),
     stock: toNumber(body.stock) ?? 0,
     tags: Array.isArray(body.tags)
       ? toJsonList(body.tags)

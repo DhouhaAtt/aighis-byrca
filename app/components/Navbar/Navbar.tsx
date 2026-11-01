@@ -11,6 +11,7 @@ import { useWishlist } from "../../context/WishlistContext";
 import { useCart } from "../../context/CartContext";
 import { useLocale } from "../../context/LocaleContext";
 import { allProducts, type Product } from "../NewArrivals/products";
+import { formatTndPrice } from "../../lib/formatPrice";
 
 interface Props {
   compact?: boolean;
@@ -118,7 +119,7 @@ export default function Navbar({ compact = false }: Props) {
                   <div className={styles.searchResultInfo}>
                     <span className={styles.searchResultName}>{product.name}</span>
                     <span className={styles.searchResultCategory}>{product.category}</span>
-                    <span className={styles.searchResultPrice}>{product.price}</span>
+                    <span className={styles.searchResultPrice}>{formatTndPrice(product.price)}</span>
                   </div>
                 </Link>
               ))

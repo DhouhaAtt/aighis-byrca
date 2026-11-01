@@ -11,6 +11,7 @@ import PageHeader from "../components/PageHeader/PageHeader";
 import { useCart } from "../context/CartContext";
 import { useLocale } from "../context/LocaleContext";
 import { getLocalizedProductCopy } from "../lib/i18n/productCopy";
+import { formatTndPrice } from "../lib/formatPrice";
 
 import styles from "./CheckoutPage.module.css";
 
@@ -297,7 +298,7 @@ export default function CheckoutPage() {
                     {item.color ? ` · ${item.color}` : ""} &middot; {t.cart.item}: {item.quantity}
                   </div>
                   </div>
-                  <div className={styles.summaryItemPrice}>{item.price}</div>
+                  <div className={styles.summaryItemPrice}>{formatTndPrice(item.price)}</div>
                 </div>
               ))}
             </div>

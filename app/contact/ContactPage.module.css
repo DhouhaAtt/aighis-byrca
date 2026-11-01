@@ -71,6 +71,21 @@ color:#999;
 flex-shrink:0;
 }
 
+.emailAddresses{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.emailAddresses a{
+color:inherit;
+text-decoration:none;
+}
+
+.emailAddresses a:hover{
+text-decoration:underline;
+}
+
 /* RIGHT - form */
 
 .formCol{

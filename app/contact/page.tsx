@@ -69,7 +69,9 @@ export default function ContactPage() {
               <div className={styles.infoDetails}>
                 <div className={styles.infoDetail}>
                   <Mail size={16} strokeWidth={1.5} />
-                  <span>contact@aighisbyrca.com</span>
+                  <div className={styles.emailAddresses}>
+                    <a href="mailto:aighisbyrca@gmail.com">aighisbyrca@gmail.com</a>
+                  </div>
                 </div>
                 <div className={styles.infoDetail}>
                   <MapPin size={16} strokeWidth={1.5} />

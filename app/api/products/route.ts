@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     if (!isValidProductPayload(body)) {
       return NextResponse.json(
-        { error: "Name, price, and image are required" },
+        { error: "Name and image are required; prices must contain digits only." },
         { status: 400 }
       );
     }
@@ -58,11 +58,12 @@ export async function POST(request: Request) {
 
     const variants = toVariantInputs(body);
     if (variants) {
-      await variantRepository.sync(product.id, variants);
+      await variantRepository.sync(product.id, variants, { recalculateProductStock: false });
     } else {
       await variantRepository.sync(
         product.id,
-        defaultVariants(body.sizes, body.colors)
+        defaultVariants(body.sizes, body.colors),
+        { recalculateProductStock: false }
       );
     }
 

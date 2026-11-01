@@ -14,13 +14,15 @@ import SizeSelector from "./SizeSelector";
 import AddToCart from "./AddToCart";
 import { discountPercent } from "../../../lib/pricing";
 import { localizeCategoryLabel } from "../../../lib/i18n/categoryLabel";
+import { useProductSelection } from "./ProductSelectionContext";
+import { formatTndPrice } from "../../../lib/formatPrice";
 
 interface Props {
   product: ProductDetail;
 }
 
 export default function ProductInfo({ product }: Props) {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  const { selectedColor, setSelectedColor } = useProductSelection();
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "");
   const { isLiked, toggleItem } = useWishlist();
   const { t } = useLocale();
@@ -39,12 +41,12 @@ export default function ProductInfo({ product }: Props) {
 
       {showSale ? (
         <p className={styles.priceRow}>
-          <span className={styles.originalPrice}>{product.originalPrice}</span>
-          <span className={styles.price}>{product.price}</span>
+          <span className={styles.originalPrice}>{formatTndPrice(product.originalPrice)}</span>
+          <span className={styles.price}>{formatTndPrice(product.price)}</span>
           <span className={styles.discountBadge}>-{discount}%</span>
         </p>
       ) : (
-        <p className={styles.price}>{product.price}</p>
+        <p className={styles.price}>{formatTndPrice(product.price)}</p>
       )}
 
       <p className={styles.category}>{localizedCategory}</p>
@@ -52,7 +54,7 @@ export default function ProductInfo({ product }: Props) {
       {product.colors.length > 0 && (
         <VariantSelector
           variants={product.colors}
-          selected={selectedColor}
+          selected={selectedColor ?? product.colors[0]}
           onChange={setSelectedColor}
           label={t.productDetail.color}
         />
@@ -73,7 +75,7 @@ export default function ProductInfo({ product }: Props) {
             name: localizedName,
             price: product.price,
             category: product.category,
-            image: product.images[0],
+            image: selectedColor?.image || product.images[0],
           }}
           size={selectedSize}
           color={selectedColor?.name ?? null}
@@ -87,7 +89,7 @@ export default function ProductInfo({ product }: Props) {
               name: localizedName,
               price: product.price,
               category: product.category,
-              image: product.images[0],
+              image: selectedColor?.image || product.images[0],
             })
           }
           className={styles.wishlistBtn}

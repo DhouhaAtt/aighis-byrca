@@ -3,8 +3,6 @@ export const topMenu = [
 
   "Sale",
 
-  "Casa",
-
   //   "Food & Beverage",
 
   "World",

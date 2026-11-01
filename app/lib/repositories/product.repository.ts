@@ -9,6 +9,7 @@ export interface CreateProductInput {
   gender?: string | null;
   isOnSale?: boolean;
   isNewArrival?: boolean;
+  isPremium?: boolean;
   stock?: number;
   tags?: string | null;
   collection?: string | null;

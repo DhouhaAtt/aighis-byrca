@@ -16,6 +16,7 @@ import {
 
 import styles from "./OutfitBuilderPage.module.css";
 import { useLocale } from "../context/LocaleContext";
+import { formatTndPrice } from "../lib/formatPrice";
 
 const TOTAL_STEPS = questions.length;
 
@@ -270,7 +271,7 @@ export default function OutfitBuilderPage() {
                         >
                           {item.product.name}
                         </Link>
-                        <span className={styles.resultPrice}>{item.product.price}</span>
+                        <span className={styles.resultPrice}>{formatTndPrice(item.product.price)}</span>
                       </>
                     )}
                   </div>

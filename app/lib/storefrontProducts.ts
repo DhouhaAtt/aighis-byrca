@@ -59,6 +59,7 @@ export async function getNewArrivals(): Promise<Product[]> {
   const rows = await fetchRows();
   return rows
     .filter((row) => row.isNewArrival)
+    .sort((a, b) => b.id - a.id)
     .map(toStorefrontProduct);
 }
 
@@ -67,10 +68,13 @@ export async function getProductsByGender(
 ): Promise<Product[]> {
   const rows = await fetchRows();
   return rows
-    .filter(
-      (row) =>
-        row.gender?.toLowerCase() === gender || row.gender?.toLowerCase() === "unisex"
-    )
+    .filter((row) => {
+      const normalizedGender = row.gender?.trim().toLowerCase();
+      return normalizedGender === gender ||
+        normalizedGender === "unisex" ||
+        normalizedGender === "mixte" ||
+        normalizedGender === "unisexe";
+    })
     .map(toStorefrontProduct);
 }
 

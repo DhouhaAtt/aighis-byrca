@@ -27,6 +27,7 @@ model Product {
   gender           String?
   isOnSale         Boolean  @default(false)
   isNewArrival     Boolean  @default(false)
+  isPremium        Boolean  @default(false)
   stock            Int      @default(0)
   tags             String?
   collection       String?

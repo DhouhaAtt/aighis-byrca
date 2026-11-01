@@ -31,7 +31,7 @@ export interface Translations {
   search: { placeholder: string; browseCategories: string; noResults: string };
   filters: {
     filters: string; all: string; gender: string; genders: Record<string, string>; price: string; size: string; color: string;
-    allColors: string; clear: string; noProducts: string; product: string; products: string;
+    allColors: string; clear: string; resetPrice: string; noProducts: string; product: string; products: string;
   };
   contactPage: {
     subtitle: string; thankYou: string; received: string; backHome: string;
@@ -172,6 +172,7 @@ export interface Translations {
     legalArea: string;
     contact: string;
     followUs: string;
+    emailUs: string;
     countryLanguage: string;
     tunisia: string;
     english: string;

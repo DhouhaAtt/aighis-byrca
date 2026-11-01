@@ -8,11 +8,12 @@ export interface Product {
   image: string;
   hoverImage?: string;
   isOnSale?: boolean;
+  isPremium?: boolean;
   originalPrice?: string;
   gender?: "women" | "men" | "unisex";
   tags?: string[];
   sizes?: string[];
-  colors?: { name: string; hex: string }[];
+  colors?: { name: string; hex: string; image?: string | null }[];
 }
 
 export const womenProducts: Product[] = [

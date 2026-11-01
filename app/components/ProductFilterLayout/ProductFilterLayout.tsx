@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "../../context/LocaleContext";
 import { SlidersHorizontal, X } from "lucide-react";
@@ -11,6 +11,8 @@ import Pagination from "../Pagination/Pagination";
 import type { Product } from "../NewArrivals/products";
 
 const PER_PAGE = 8;
+const PRICE_MIN = 0;
+const PRICE_MAX = 499;
 
 interface Filters {
   gender: string;
@@ -25,7 +27,7 @@ const INITIAL_FILTERS: Filters = {
   gender: "all",
   category: "all",
   priceMin: 0,
-  priceMax: 999,
+  priceMax: PRICE_MAX,
   size: "all",
   color: "all",
 };
@@ -54,83 +56,84 @@ function RangeSlider({
   onChangeMin: (v: number) => void;
   onChangeMax: (v: number) => void;
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef<"min" | "max" | null>(null);
+  const toPercent = (value: number) => max === min ? 0 : ((value - min) / (max - min)) * 100;
+  const leftPercent = toPercent(valueMin);
+  const rightPercent = toPercent(valueMax);
 
-  const toPercent = (v: number) =>
-    max === min ? 0 : ((v - min) / (max - min)) * 100;
-
-  const toValue = (clientX: number) => {
-    const track = trackRef.current;
-    if (!track) return valueMin;
-    const rect = track.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    return Math.round(min + pct * (max - min));
+  const changeMin = (rawValue: string) => {
+    const value = rawValue === "" ? min : Number(rawValue);
+    if (Number.isFinite(value)) onChangeMin(Math.max(min, Math.min(value, valueMax)));
   };
-
-  const handlePointerDown = useCallback(
-    (which: "min" | "max") => (e: React.PointerEvent) => {
-      e.preventDefault();
-      dragging.current = which;
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    },
-    []
-  );
-
-  const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!dragging.current) return;
-      const val = toValue(e.clientX);
-      if (dragging.current === "min") {
-        onChangeMin(Math.min(val, valueMax));
-      } else {
-        onChangeMax(Math.max(val, valueMin));
-      }
-    },
-    [valueMin, valueMax, onChangeMin, onChangeMax]
-  );
-
-  const handlePointerUp = useCallback(() => {
-    dragging.current = null;
-  }, []);
-
-  const leftPct = toPercent(valueMin);
-  const rightPct = toPercent(valueMax);
+  const changeMax = (rawValue: string) => {
+    const value = rawValue === "" ? min : Number(rawValue);
+    if (Number.isFinite(value)) onChangeMax(Math.min(max, Math.max(value, valueMin)));
+  };
 
   return (
     <div className={styles.sliderContainer}>
-      <div className={styles.sliderLabels}>
-        <span>{valueMin} Tnd</span>
-        <span>{valueMax} Tnd</span>
+      <div className={styles.priceInputs}>
+        <label className={styles.priceInputGroup}>
+          <span className={styles.priceInputLabel}>Min</span>
+          <span className={styles.priceInputBox}>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={min}
+              max={valueMax}
+              step={1}
+              value={valueMin}
+              aria-label="Minimum price in TND"
+              onChange={(event) => changeMin(event.target.value)}
+            />
+            <span>TND</span>
+          </span>
+        </label>
+        <label className={styles.priceInputGroup}>
+          <span className={styles.priceInputLabel}>Max</span>
+          <span className={styles.priceInputBox}>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={valueMin}
+              max={max}
+              step={1}
+              value={valueMax}
+              aria-label="Maximum price in TND"
+              onChange={(event) => changeMax(event.target.value)}
+            />
+            <span>TND</span>
+          </span>
+        </label>
       </div>
 
       <div
-        ref={trackRef}
         className={styles.sliderTrack}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+        style={{ backgroundImage: `linear-gradient(to right, #dedede 0%, #dedede ${leftPercent}%, #111 ${leftPercent}%, #111 ${rightPercent}%, #dedede ${rightPercent}%, #dedede 100%)` }}
       >
-        <div
-          className={styles.sliderFill}
-          style={{ left: `${leftPct}%`, width: `${rightPct - leftPct}%` }}
+        <input
+          className={`${styles.sliderRange} ${styles.sliderRangeMin}`}
+          type="range"
+          min={min}
+          max={max}
+          step={1}
+          value={valueMin}
+          aria-label="Minimum price"
+          onChange={(event) => onChangeMin(Math.min(Number(event.target.value), valueMax))}
         />
-
-        <div
-          className={styles.sliderThumb}
-          style={{ left: `${leftPct}%` }}
-          onPointerDown={handlePointerDown("min")}
-        />
-
-        <div
-          className={styles.sliderThumb}
-          style={{ left: `${rightPct}%` }}
-          onPointerDown={handlePointerDown("max")}
+        <input
+          className={`${styles.sliderRange} ${styles.sliderRangeMax}`}
+          type="range"
+          min={min}
+          max={max}
+          step={1}
+          value={valueMax}
+          aria-label="Maximum price"
+          onChange={(event) => onChangeMax(Math.max(Number(event.target.value), valueMin))}
         />
       </div>
     </div>
   );
 }
-
 /* ===================== MAIN COMPONENT ===================== */
 
 interface Props {
@@ -147,12 +150,6 @@ export default function ProductFilterLayout({ products }: Props) {
   const initialPage = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const priceBounds = useMemo(() => {
-    const prices = products.map(parsePrice);
-    if (prices.length === 0) return { min: 0, max: 999 };
-    return { min: Math.min(...prices), max: Math.max(...prices) };
-  }, [products]);
 
   const allCategories = useMemo(
     () => [...new Set(products.map((p) => p.category))],
@@ -204,6 +201,11 @@ export default function ProductFilterLayout({ products }: Props) {
     resetPageInUrl();
   }, [resetPageInUrl]);
 
+  const resetPriceRange = useCallback(() => {
+    setFilters((prev) => ({ ...prev, priceMin: PRICE_MIN, priceMax: PRICE_MAX }));
+    resetPageInUrl();
+  }, [resetPageInUrl]);
+
   const filtered = useMemo(() => {
     return products.filter((p) => {
       if (filters.gender !== "all" && p.gender !== filters.gender) return false;
@@ -234,8 +236,8 @@ export default function ProductFilterLayout({ products }: Props) {
   const hasActiveFilters =
     filters.gender !== "all" ||
     filters.category !== "all" ||
-    filters.priceMin > priceBounds.min ||
-    filters.priceMax < priceBounds.max ||
+    filters.priceMin > PRICE_MIN ||
+    filters.priceMax < PRICE_MAX ||
     filters.size !== "all" ||
     filters.color !== "all";
 
@@ -291,13 +293,18 @@ export default function ProductFilterLayout({ products }: Props) {
         <div className={styles.filterSectionTitle}>{t.filters.price}</div>
         <div className={styles.filterSectionContent}>
           <RangeSlider
-            min={priceBounds.min}
-            max={priceBounds.max}
+            min={PRICE_MIN}
+            max={PRICE_MAX}
             valueMin={filters.priceMin}
             valueMax={filters.priceMax}
             onChangeMin={(v) => setFilter("priceMin", v)}
             onChangeMax={(v) => setFilter("priceMax", v)}
           />
+          {(filters.priceMin !== PRICE_MIN || filters.priceMax !== PRICE_MAX) && (
+            <button type="button" className={styles.priceResetBtn} onClick={resetPriceRange}>
+              {t.filters.resetPrice}
+            </button>
+          )}
         </div>
       </div>
 

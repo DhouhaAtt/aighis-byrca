@@ -9,21 +9,14 @@ import { useLocale } from "../../context/LocaleContext";
 
 export default function Footer() {
   const { t, locale, setLocale } = useLocale();
-  const [city, setCity] = useState("");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterNotice, setNewsletterNotice] = useState("");
-
-  const searchStores = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const query = encodeURIComponent(`Aighis Byrca ${city.trim()}`);
-    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank", "noopener,noreferrer");
-  };
 
   const requestNewsletter = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const subject = encodeURIComponent("Newsletter subscription request");
     const body = encodeURIComponent(`Please subscribe this email address to the Aighis Byrca newsletter: ${newsletterEmail}`);
-    window.location.href = `mailto:contact@aighisbyrca.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:aighisbyrca@gmail.com?subject=${subject}&body=${body}`;
     setNewsletterNotice(t.footer.newsletterDraftNotice);
   };
 
@@ -32,24 +25,34 @@ export default function Footer() {
       {/* ========================= TOP ========================= */}
 
       <div className={styles.top}>
-        {/* Store Locator */}
-
         <div className={styles.column}>
-          <h3 className={styles.heading}>{t.footer.storeLocator}</h3>
-
-          <p className={styles.description}>{t.footer.storeLocatorDesc}</p>
-
-          <form className={styles.form} onSubmit={searchStores}>
-            <input
-              type="text"
-              placeholder={t.footer.storeLocatorPlaceholder}
-              value={city}
-              onChange={(event) => setCity(event.target.value)}
-              required
-            />
-
-            <button type="submit">{t.footer.search}</button>
-          </form>
+          <h3 className={styles.heading}>{t.footer.followUs}</h3>
+          <div className={`${styles.socialLinks} ${styles.socialIcons}`}>
+            <a href="http://instagram.com/aighis_byrca" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <svg className={`${styles.socialIcon} ${styles.instagramIcon}`} viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r=".8" />
+              </svg>
+              <span className={styles.socialName}>Instagram ↗</span>
+            </a>
+            <span role="img" aria-label="Facebook">
+              <svg className={styles.socialIcon} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13.4 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.2v3.1H10v8h3.4z" />
+              </svg>
+              <span className={styles.socialName}>Facebook ↗</span>
+            </span>
+            <span role="img" aria-label="TikTok">
+              <svg className={styles.socialIcon} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M19.6 7.2a5.4 5.4 0 0 1-3.4-1.1v7.3a5.9 5.9 0 1 1-5.9-5.9c.4 0 .8 0 1.2.1v3.3a2.8 2.8 0 1 0 1.7 2.6V2h3.2a5.4 5.4 0 0 0 3.2 3.2z" />
+              </svg>
+              <span className={styles.socialName}>TikTok ↗</span>
+            </span>
+          </div>
+          <p className={styles.emailPrompt}>{t.footer.emailUs}</p>
+          <div className={styles.socialLinks}>
+            <a href="mailto:aighisbyrca@gmail.com">aighisbyrca@gmail.com</a>
+          </div>
         </div>
 
         {/* Brand */}
@@ -81,11 +84,13 @@ export default function Footer() {
 
           {newsletterNotice && <p role="status" className={styles.description}>{newsletterNotice}</p>}
 
+          {/* Consent checkbox hidden temporarily.
           <label className={styles.checkbox}>
             <input type="checkbox" required />
 
             <span>{t.footer.privacyPolicy}</span>
           </label>
+          */}
         </div>
       </div>
 
@@ -121,6 +126,7 @@ export default function Footer() {
             <span>+</span>
           </Link>
 
+          {/* Bottom navigation follow link hidden while the social links are shown above.
           <Link
             href="https://www.instagram.com/aighis_byrca/"
             target="_blank"
@@ -130,6 +136,7 @@ export default function Footer() {
             {t.footer.followUs}
             <span>+</span>
           </Link>
+          */}
         </div>
 
         <div className={styles.language}>

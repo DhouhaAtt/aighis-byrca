@@ -130,58 +130,166 @@
 /* ================= RANGE SLIDER ================= */
 
 .sliderContainer {
-  padding: 8px 7px 4px 7px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 2px 0;
 }
 
-.sliderLabels {
+.priceInputs {
   display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  font-weight: 400;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.priceInputGroup {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.priceInputLabel {
+  color: #777;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.priceInputBox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  min-width: 0;
+  padding: 0 9px;
+  border: 1px solid #d8d8d8;
+  background: #fff;
+  color: #777;
+  font-size: 10px;
+  letter-spacing: .04em;
+  transition: border-color .2s ease;
+}
+
+.priceInputBox:focus-within {
+  border-color: #111;
+}
+
+.priceInputBox input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
   color: #111;
-  letter-spacing: 0.04em;
-  margin-bottom: 16px;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: .02em;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.priceInputBox input::-webkit-inner-spin-button,
+.priceInputBox input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
 }
 
 .sliderTrack {
   position: relative;
   width: 100%;
+  height: 28px;
+  margin: 0 0 4px;
+  background-color: #e2e2e2;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 2px;
+}
+
+.sliderRange {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  pointer-events: none;
+  touch-action: pan-y;
+}
+
+.sliderRange::-webkit-slider-runnable-track {
   height: 2px;
-  background: #e0e0e0;
-  border-radius: 1px;
-  cursor: pointer;
+  background: transparent;
 }
 
-.sliderFill {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  background: #111;
-  border-radius: 1px;
+.sliderRange::-moz-range-track {
+  height: 2px;
+  background: transparent;
 }
 
-.sliderThumb {
-  position: absolute;
-  top: 50%;
+.sliderRange::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
-  background: white;
+  margin-top: -6px;
+  appearance: none;
+  -webkit-appearance: none;
   border: 2px solid #111;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  background: #fff;
+  box-shadow: 0 0 0 3px #fff;
   cursor: grab;
-  touch-action: none;
-  transition: transform 0.15s ease;
-  z-index: 2;
+  pointer-events: auto;
 }
 
-.sliderThumb:hover {
-  transform: translate(-50%, -50%) scale(1.15);
+.sliderRange::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #111;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px #fff;
+  cursor: grab;
+  pointer-events: auto;
 }
 
-.sliderThumb:active {
+.sliderRange:focus-visible {
+  outline: none;
+}
+
+.sliderRange:focus-visible::-webkit-slider-thumb,
+.sliderRange:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px #ddd;
+}
+
+.sliderRange:active::-webkit-slider-thumb,
+.sliderRange:active::-moz-range-thumb {
   cursor: grabbing;
-  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.sliderRangeMin { z-index: 2; }
+.sliderRangeMax { z-index: 3; }
+
+.priceResetBtn {
+  display: block;
+  margin: 2px 0 0 auto;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+
+.priceResetBtn:hover,
+.priceResetBtn:focus-visible {
+  color: #111;
 }
 
 /* ================= RESET ================= */

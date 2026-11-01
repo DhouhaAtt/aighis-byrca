@@ -10,6 +10,7 @@ import PageHeader from "../components/PageHeader/PageHeader";
 import { useCart } from "../context/CartContext";
 import { useLocale } from "../context/LocaleContext";
 import { getLocalizedProductCopy } from "../lib/i18n/productCopy";
+import { formatTndPrice } from "../lib/formatPrice";
 import { useState } from "react";
 
 import styles from "./CartPage.module.css";
@@ -76,7 +77,7 @@ export default function CartPage() {
                       {item.color ? ` · ${item.color}` : ""}
                     </p>
 
-                    <p className={styles.itemPrice}>{item.price}</p>
+                    <p className={styles.itemPrice}>{formatTndPrice(item.price)}</p>
 
                     <div className={styles.quantity}>
                       <button
@@ -106,7 +107,7 @@ export default function CartPage() {
 
                   <div className={styles.itemActions}>
                     <p className={styles.itemTotal}>
-                      {item.price}
+                      {formatTndPrice(item.price)}
                     </p>
 
                     <button

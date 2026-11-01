@@ -183,7 +183,7 @@ export async function sendContactMessage(
 ): Promise<SendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM_EMAIL || FROM_FALLBACK;
-  const recipient = process.env.ADMIN_EMAIL;
+  const recipient = "aighisbyrca@gmail.com";
 
   if (!apiKey || !recipient) {
     return { sent: false, reason: "Contact email delivery is not configured" };

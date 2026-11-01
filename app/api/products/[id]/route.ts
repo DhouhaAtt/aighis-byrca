@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { productRepository } from "../../../lib/repositories/product.repository";
 import { isAdmin, unauthorized } from "../../../lib/requireAdmin";
 import { variantRepository } from "../../../lib/repositories/variant.repository";
-import { toVariantInputs } from "../../../lib/productPayload";
+import { isDigitsOnlyPrice, toVariantInputs } from "../../../lib/productPayload";
 
 export async function GET(
   _request: NextRequest,
@@ -35,6 +35,12 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+    if (
+      (body.price !== undefined && !isDigitsOnlyPrice(body.price)) ||
+      (body.originalPrice !== undefined && body.originalPrice !== null && body.originalPrice !== "" && !isDigitsOnlyPrice(body.originalPrice))
+    ) {
+      return NextResponse.json({ error: "Price fields must contain digits only." }, { status: 400 });
+    }
     const existing = await productRepository.findById(Number(id));
     if (!existing) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -43,11 +49,13 @@ export async function PUT(
       name: body.name ?? existing.name,
       price: body.price ?? existing.price,
       originalPrice: body.originalPrice ?? existing.originalPrice,
+      stock: body.stock ?? existing.stock,
       image: body.image ?? existing.image,
       hoverImage: body.hoverImage ?? existing.hoverImage,
       gender: body.gender ?? existing.gender,
       isOnSale: body.isOnSale ?? existing.isOnSale,
       isNewArrival: body.isNewArrival ?? existing.isNewArrival,
+      isPremium: body.isPremium ?? existing.isPremium,
       tags: body.tags ?? existing.tags,
       collection: body.collection ?? existing.collection,
       description: body.description ?? existing.description,
@@ -65,14 +73,15 @@ export async function PUT(
 
     const variants = toVariantInputs(body);
     if (variants) {
-      await variantRepository.sync(updated.id, variants);
+      await variantRepository.sync(updated.id, variants, { recalculateProductStock: false });
     }
 
     const full = await productRepository.findById(updated.id);
     return NextResponse.json(full);
-  } catch {
+  } catch (error) {
+    console.error("[api/products] Failed to update product", error);
     return NextResponse.json(
-      { error: "Failed to update product" },
+      { error: error instanceof Error ? error.message : "Failed to update product" },
       { status: 500 }
     );
   }

@@ -55,7 +55,11 @@ export const variantRepository = {
    * Replaces the variant set of a product with the given combinations.
    * Variants that disappear are removed, existing ones keep their stock.
    */
-  async sync(productId: number, variants: VariantInput[]): Promise<VariantWithProduct[]> {
+  async sync(
+    productId: number,
+    variants: VariantInput[],
+    options: { recalculateProductStock?: boolean } = {}
+  ): Promise<VariantWithProduct[]> {
     const desired = new Map<string, VariantInput>();
     for (const variant of variants) {
       const size = normalize(variant.size);
@@ -105,7 +109,9 @@ export const variantRepository = {
       ),
     ]);
 
-    await recalculateProductStock(productId);
+    if (options.recalculateProductStock !== false) {
+      await recalculateProductStock(productId);
+    }
 
     return this.findByProduct(productId);
   },

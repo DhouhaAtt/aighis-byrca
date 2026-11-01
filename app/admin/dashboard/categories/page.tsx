@@ -26,7 +26,8 @@ export default function AdminCategoriesPage() {
   const [editing, setEditing] = useState<Category | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [page, setPage] = useState(1);
-  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const [deleteTargets, setDeleteTargets] = useState<Category[] | null>(null);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [snackbar, setSnackbar] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -62,13 +63,13 @@ export default function AdminCategoriesPage() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (deleteTarget) setDeleteTarget(null);
+        if (deleteTargets) setDeleteTargets(null);
         else if (showModal) setShowModal(false);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [showModal, deleteTarget]);
+  }, [showModal, deleteTargets]);
 
   useEffect(() => {
     setPage(1);
@@ -109,11 +110,11 @@ export default function AdminCategoriesPage() {
             body: JSON.stringify(payload),
           });
           if (!res.ok) {
-            showSnackbar("error", "Y a un problème, impossible de mettre à jour");
+            showSnackbar("error", "Impossible de mettre à jour la catégorie");
             return;
           }
           const updated = await res.json();
-          setCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+          setCategories((prev) => prev.map((category) => category.id === updated.id ? updated : category));
           showSnackbar("success", "Catégorie mise à jour avec succès");
         } else {
           const res = await fetch("/api/categories", {
@@ -122,7 +123,7 @@ export default function AdminCategoriesPage() {
             body: JSON.stringify(payload),
           });
           if (!res.ok) {
-            showSnackbar("error", "Y a un problème, impossible de créer");
+            showSnackbar("error", "Impossible de créer la catégorie");
             return;
           }
           const created = await res.json();
@@ -131,34 +132,32 @@ export default function AdminCategoriesPage() {
         }
         setShowModal(false);
       } catch {
-        showSnackbar("error", "Y a un problème, impossible de sauvegarder");
+        showSnackbar("error", "Impossible d'enregistrer la catégorie");
       }
     },
     [form, editing, showSnackbar]
   );
-
   const confirmDelete = useCallback(async () => {
-    if (!deleteTarget) return;
+    if (!deleteTargets?.length) return;
     try {
-      const res = await fetch(`/api/categories/${deleteTarget.id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        showSnackbar("error", data?.error || "Y a un problème, impossible de supprimer");
-        setDeleteTarget(null);
-        return;
-      }
+      const res = await fetch("/api/categories/bulk-delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids: deleteTargets.map((category) => category.id) }) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || "La suppression a échoué");
       setCategories((prev) => {
-        const next = prev.filter((c) => c.id !== deleteTarget.id);
+        const deletedIds = new Set(deleteTargets.map((category) => category.id));
+        const next = prev.filter((c) => !deletedIds.has(c.id));
         const newTotalPages = Math.max(1, Math.ceil(next.length / PER_PAGE));
         if (page > newTotalPages) setPage(newTotalPages);
         return next;
       });
-      showSnackbar("success", "Catégorie supprimée avec succès");
-    } catch {
-      showSnackbar("error", "Y a un problème, impossible de supprimer");
+      const deletedIds = new Set(deleteTargets.map((category) => category.id));
+      setSelectedCategoryIds((current) => current.filter((id) => !deletedIds.has(id)));
+      showSnackbar("success", `${data?.deletedCount ?? deleteTargets.length} catégorie(s) supprimée(s) avec succès`);
+    } catch (error) {
+      showSnackbar("error", error instanceof Error ? error.message : "La suppression a échoué");
     }
-    setDeleteTarget(null);
-  }, [deleteTarget, showSnackbar, page]);
+    setDeleteTargets(null);
+  }, [deleteTargets, showSnackbar, page]);
 
   return (
     <div>
@@ -180,11 +179,19 @@ export default function AdminCategoriesPage() {
           Ajouter une catégorie
         </button>
       </div>
+      {selectedCategoryIds.length > 0 && (
+        <div className={styles.selectionToolbar}>
+          <span>{selectedCategoryIds.length} catégorie(s) sélectionnée(s)</span>
+          <button className={styles.bulkDeleteButton} onClick={() => setDeleteTargets(categories.filter((category) => selectedCategoryIds.includes(category.id)))}>Supprimer la sélection</button>
+          <button className={styles.selectionClear} onClick={() => setSelectedCategoryIds([])}>Effacer la sélection</button>
+        </div>
+      )}
 
       <div className={styles.tableWrap}>
       <table className={styles.table}>
         <thead>
           <tr>
+            <th aria-label="Sélectionner" />
             <th>Nom</th>
             <th>Identifiant</th>
             <th>Description</th>
@@ -197,19 +204,20 @@ export default function AdminCategoriesPage() {
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#888" }}>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>
                 Chargement…
               </td>
             </tr>
           ) : paginated.length === 0 ? (
             <tr>
-              <td colSpan={7} style={{ padding: 40, textAlign: "center", color: "#888" }}>
+              <td colSpan={8} style={{ padding: 40, textAlign: "center", color: "#888" }}>
                 Aucune catégorie trouvée
               </td>
             </tr>
           ) : (
             paginated.map((cat) => (
               <tr key={cat.id}>
+                <td><input aria-label={`Sélectionner ${cat.name}`} type="checkbox" checked={selectedCategoryIds.includes(cat.id)} onChange={(event) => setSelectedCategoryIds((current) => event.target.checked ? [...current, cat.id] : current.filter((id) => id !== cat.id))} /></td>
                 <td>
                   <span className={styles.productName}>{cat.name}</span>
                 </td>
@@ -233,7 +241,7 @@ export default function AdminCategoriesPage() {
                     <button className={styles.actionBtn} onClick={() => openEdit(cat)}>
                       <Edit3 size={15} strokeWidth={1.5} />
                     </button>
-                    <button className={styles.actionBtn} onClick={() => setDeleteTarget(cat)}>
+                    <button className={styles.actionBtn} onClick={() => setDeleteTargets([cat])}>
                       <Trash2 size={15} strokeWidth={1.5} />
                     </button>
                   </div>
@@ -377,26 +385,27 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
+      {deleteTargets && (
+        <div className={styles.overlay} onClick={() => setDeleteTargets(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ width: 400 }}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>Confirmer la suppression</h3>
-              <button className={styles.modalClose} onClick={() => setDeleteTarget(null)}>
+              <button className={styles.modalClose} onClick={() => setDeleteTargets(null)}>
                 <X size={18} strokeWidth={1.5} />
               </button>
             </div>
             <div className={styles.modalBody}>
               <p style={{ fontSize: 13, color: "#555", margin: 0 }}>
-                Voulez-vous vraiment supprimer <strong>{deleteTarget.name}</strong> ? Cette action est irréversible.
+                Voulez-vous vraiment supprimer {deleteTargets.length === 1 ? <strong>{deleteTargets[0].name}</strong> : <strong>{deleteTargets.length} catégories</strong>} ? Cette action est irréversible. Les produits associés resteront dans la boutique, mais ne seront plus rattachés à ces catégories. ({deleteTargets.reduce((total, category) => total + category._count.products, 0)} produit(s) concerné(s).)
               </p>
+              {deleteTargets.length > 1 && <ul className={styles.deleteList}>{deleteTargets.map((category) => <li key={category.id}>{category.name} · {category._count.products} produit(s)</li>)}</ul>}
             </div>
             <div className={styles.modalFooter} style={{ gap: 12 }}>
-              <button className={styles.cancelBtn} onClick={() => setDeleteTarget(null)}>
+              <button className={styles.cancelBtn} onClick={() => setDeleteTargets(null)}>
                 Annuler
               </button>
               <button className={styles.saveBtn} style={{ background: "#c62828" }} onClick={confirmDelete}>
-                Supprimer
+                Supprimer {deleteTargets.length > 1 ? `(${deleteTargets.length})` : ""}
               </button>
             </div>
           </div>

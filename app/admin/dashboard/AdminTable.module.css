@@ -24,6 +24,97 @@
   border-color: #111;
 }
 
+.filterSelect {
+  width: 180px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  font-weight: 300;
+  outline: none;
+  transition: border-color .3s;
+}
+
+.filterSelect:focus {
+  border-color: #111;
+}
+
+.toolbarActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.genderFilter {
+  position: relative;
+  display: block;
+  width: 180px;
+  height: 42px;
+}
+
+.genderFilterButton {
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  border: 1px solid #e5e0d9;
+  background: #fff;
+  color: #222;
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s ease;
+}
+
+.genderFilterButton:hover,
+.genderFilterButton:focus-visible,
+.genderFilter:focus-within .genderFilterButton {
+  border-color: #b49a70;
+  outline: none;
+}
+
+.genderFilterMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  min-width: 180px;
+  padding: 7px 0;
+  border: 1px solid #e5e0d9;
+  background: #fff;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 8%);
+}
+
+.genderFilterOption {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 12px;
+  color: #333;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.genderFilterOption:hover {
+  background: #f8f6f2;
+}
+
+.genderFilterOption input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #b49a70;
+  cursor: pointer;
+}
+
 .addBtn {
   height: 42px;
   padding: 0 28px;
@@ -199,6 +290,52 @@
   border-top: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
+}
+
+.selectionToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: -8px 0 16px;
+  background: #f7f5f1;
+  color: #444;
+  font-size: 12px;
+}
+
+.selectionClear {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bulkDeleteButton {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 0;
+  background: #a52f2a;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.deleteList {
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 12px 0 0;
+  padding: 10px 10px 10px 28px;
+  background: #fafafa;
+  color: #555;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .selectionToolbar { flex-wrap: wrap; }
+  .selectionClear { margin-left: 0; }
 }
 
 .field {
@@ -400,6 +537,113 @@
 
 .selectedTagRemove:hover {
   color: #c62828;
+}
+
+.colorImageList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.colorImageTitle {
+  margin: 0 0 4px;
+  color: #333;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.colorImageRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 7px 9px;
+  border: 1px solid #eee;
+  background: #fff;
+}
+
+.colorImagePreview,
+.colorImagePlaceholder {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  object-fit: cover;
+  border: 1px solid #eee;
+  border-radius: 2px;
+}
+
+.colorImagePlaceholder {
+  border-radius: 50%;
+}
+
+.colorImageDetails {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.colorImageName {
+  color: #333;
+  font-size: 12px;
+}
+
+.colorImageAction {
+  position: relative;
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 11px;
+  border: 1px solid #ddd;
+  color: #333;
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.colorImageAction:hover {
+  border-color: #111;
+}
+
+.colorImageAction input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.colorImageRemove {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+}
+
+.colorImageRemove:hover {
+  color: #c62828;
+}
+
+@media (max-width: 520px) {
+  .colorImageRow {
+    gap: 7px;
+    padding: 6px;
+  }
+
+  .colorImageAction {
+    padding: 0 7px;
+  }
 }
 
 .colorInput {
@@ -720,6 +964,29 @@
     width: 100%;
   }
 
+  .filterSelect {
+    width: 100%;
+  }
+
+  .toolbarActions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .genderFilter {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .genderFilter {
+    width: auto;
+    min-width: 0;
+  }
+
+  .genderFilterButton {
+    min-width: 148px;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
@@ -786,6 +1053,23 @@
 @media (max-width: 600px) {
   .toolbar {
     gap: 10px;
+  }
+
+  .toolbarActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .genderFilter {
+    width: 100%;
+  }
+
+  .genderFilterMenu {
+    min-width: 0;
+  }
+
+  .addBtn {
+    width: 100%;
   }
 
   .chipGroup {

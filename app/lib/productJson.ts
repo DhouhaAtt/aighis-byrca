@@ -32,6 +32,7 @@ export function parseSizes(value: string | null | undefined): string[] {
 export interface ColorOption {
   name: string;
   hex: string;
+  image?: string | null;
 }
 
 export function parseColors(value: string | null | undefined): ColorOption[] {

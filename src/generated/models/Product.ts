@@ -48,6 +48,7 @@ export type ProductMinAggregateOutputType = {
   gender: string | null
   isOnSale: boolean | null
   isNewArrival: boolean | null
+  isPremium: boolean | null
   stock: number | null
   tags: string | null
   collection: string | null
@@ -76,6 +77,7 @@ export type ProductMaxAggregateOutputType = {
   gender: string | null
   isOnSale: boolean | null
   isNewArrival: boolean | null
+  isPremium: boolean | null
   stock: number | null
   tags: string | null
   collection: string | null
@@ -104,6 +106,7 @@ export type ProductCountAggregateOutputType = {
   gender: number
   isOnSale: number
   isNewArrival: number
+  isPremium: number
   stock: number
   tags: number
   collection: number
@@ -146,6 +149,7 @@ export type ProductMinAggregateInputType = {
   gender?: true
   isOnSale?: true
   isNewArrival?: true
+  isPremium?: true
   stock?: true
   tags?: true
   collection?: true
@@ -174,6 +178,7 @@ export type ProductMaxAggregateInputType = {
   gender?: true
   isOnSale?: true
   isNewArrival?: true
+  isPremium?: true
   stock?: true
   tags?: true
   collection?: true
@@ -202,6 +207,7 @@ export type ProductCountAggregateInputType = {
   gender?: true
   isOnSale?: true
   isNewArrival?: true
+  isPremium?: true
   stock?: true
   tags?: true
   collection?: true
@@ -317,6 +323,7 @@ export type ProductGroupByOutputType = {
   gender: string | null
   isOnSale: boolean
   isNewArrival: boolean
+  isPremium: boolean
   stock: number
   tags: string | null
   collection: string | null
@@ -368,6 +375,7 @@ export type ProductWhereInput = {
   gender?: Prisma.StringNullableFilter<"Product"> | string | null
   isOnSale?: Prisma.BoolFilter<"Product"> | boolean
   isNewArrival?: Prisma.BoolFilter<"Product"> | boolean
+  isPremium?: Prisma.BoolFilter<"Product"> | boolean
   stock?: Prisma.IntFilter<"Product"> | number
   tags?: Prisma.StringNullableFilter<"Product"> | string | null
   collection?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -399,6 +407,7 @@ export type ProductOrderByWithRelationInput = {
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   isOnSale?: Prisma.SortOrder
   isNewArrival?: Prisma.SortOrder
+  isPremium?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   tags?: Prisma.SortOrderInput | Prisma.SortOrder
   collection?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -433,6 +442,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   gender?: Prisma.StringNullableFilter<"Product"> | string | null
   isOnSale?: Prisma.BoolFilter<"Product"> | boolean
   isNewArrival?: Prisma.BoolFilter<"Product"> | boolean
+  isPremium?: Prisma.BoolFilter<"Product"> | boolean
   stock?: Prisma.IntFilter<"Product"> | number
   tags?: Prisma.StringNullableFilter<"Product"> | string | null
   collection?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -464,6 +474,7 @@ export type ProductOrderByWithAggregationInput = {
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   isOnSale?: Prisma.SortOrder
   isNewArrival?: Prisma.SortOrder
+  isPremium?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   tags?: Prisma.SortOrderInput | Prisma.SortOrder
   collection?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -500,6 +511,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   gender?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   isOnSale?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   isNewArrival?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
+  isPremium?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   stock?: Prisma.IntWithAggregatesFilter<"Product"> | number
   tags?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   collection?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
@@ -527,6 +539,7 @@ export type ProductCreateInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -557,6 +570,7 @@ export type ProductUncheckedCreateInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -586,6 +600,7 @@ export type ProductUpdateInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -616,6 +631,7 @@ export type ProductUncheckedUpdateInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -646,6 +662,7 @@ export type ProductCreateManyInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -673,6 +690,7 @@ export type ProductUpdateManyMutationInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -700,6 +718,7 @@ export type ProductUncheckedUpdateManyInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -728,6 +747,7 @@ export type ProductCountOrderByAggregateInput = {
   gender?: Prisma.SortOrder
   isOnSale?: Prisma.SortOrder
   isNewArrival?: Prisma.SortOrder
+  isPremium?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   collection?: Prisma.SortOrder
@@ -762,6 +782,7 @@ export type ProductMaxOrderByAggregateInput = {
   gender?: Prisma.SortOrder
   isOnSale?: Prisma.SortOrder
   isNewArrival?: Prisma.SortOrder
+  isPremium?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   collection?: Prisma.SortOrder
@@ -790,6 +811,7 @@ export type ProductMinOrderByAggregateInput = {
   gender?: Prisma.SortOrder
   isOnSale?: Prisma.SortOrder
   isNewArrival?: Prisma.SortOrder
+  isPremium?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   tags?: Prisma.SortOrder
   collection?: Prisma.SortOrder
@@ -931,6 +953,7 @@ export type ProductCreateWithoutVariantsInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -960,6 +983,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1004,6 +1028,7 @@ export type ProductUpdateWithoutVariantsInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1033,6 +1058,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1061,6 +1087,7 @@ export type ProductCreateWithoutCategoryInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1090,6 +1117,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1147,6 +1175,7 @@ export type ProductScalarWhereInput = {
   gender?: Prisma.StringNullableFilter<"Product"> | string | null
   isOnSale?: Prisma.BoolFilter<"Product"> | boolean
   isNewArrival?: Prisma.BoolFilter<"Product"> | boolean
+  isPremium?: Prisma.BoolFilter<"Product"> | boolean
   stock?: Prisma.IntFilter<"Product"> | number
   tags?: Prisma.StringNullableFilter<"Product"> | string | null
   collection?: Prisma.StringNullableFilter<"Product"> | string | null
@@ -1174,6 +1203,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1203,6 +1233,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1247,6 +1278,7 @@ export type ProductUpdateWithoutOrderItemsInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1276,6 +1308,7 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1305,6 +1338,7 @@ export type ProductCreateManyCategoryInput = {
   gender?: string | null
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: number
   tags?: string | null
   collection?: string | null
@@ -1331,6 +1365,7 @@ export type ProductUpdateWithoutCategoryInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1360,6 +1395,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1389,6 +1425,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isOnSale?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isNewArrival?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPremium?: Prisma.BoolFieldUpdateOperationsInput | boolean
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   tags?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   collection?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1456,6 +1493,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   gender?: boolean
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: boolean
   tags?: boolean
   collection?: boolean
@@ -1488,6 +1526,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   gender?: boolean
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: boolean
   tags?: boolean
   collection?: boolean
@@ -1517,6 +1556,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   gender?: boolean
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: boolean
   tags?: boolean
   collection?: boolean
@@ -1546,6 +1586,7 @@ export type ProductSelectScalar = {
   gender?: boolean
   isOnSale?: boolean
   isNewArrival?: boolean
+  isPremium?: boolean
   stock?: boolean
   tags?: boolean
   collection?: boolean
@@ -1564,7 +1605,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "originalPrice" | "image" | "hoverImage" | "gender" | "isOnSale" | "isNewArrival" | "stock" | "tags" | "collection" | "description" | "composition" | "fit" | "productCode" | "careInstructions" | "images" | "colors" | "sizes" | "shipping" | "returns" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "originalPrice" | "image" | "hoverImage" | "gender" | "isOnSale" | "isNewArrival" | "isPremium" | "stock" | "tags" | "collection" | "description" | "composition" | "fit" | "productCode" | "careInstructions" | "images" | "colors" | "sizes" | "shipping" | "returns" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
   variants?: boolean | Prisma.Product$variantsArgs<ExtArgs>
@@ -1595,6 +1636,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     gender: string | null
     isOnSale: boolean
     isNewArrival: boolean
+    isPremium: boolean
     stock: number
     tags: string | null
     collection: string | null
@@ -2046,6 +2088,7 @@ export interface ProductFieldRefs {
   readonly gender: Prisma.FieldRef<"Product", 'String'>
   readonly isOnSale: Prisma.FieldRef<"Product", 'Boolean'>
   readonly isNewArrival: Prisma.FieldRef<"Product", 'Boolean'>
+  readonly isPremium: Prisma.FieldRef<"Product", 'Boolean'>
   readonly stock: Prisma.FieldRef<"Product", 'Int'>
   readonly tags: Prisma.FieldRef<"Product", 'String'>
   readonly collection: Prisma.FieldRef<"Product", 'String'>

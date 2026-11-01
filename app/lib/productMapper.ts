@@ -17,6 +17,7 @@ export interface ProductRow {
   gender: string | null;
   isOnSale: boolean;
   isNewArrival: boolean;
+  isPremium: boolean;
   stock: number;
   tags: string | null;
   collection: string | null;
@@ -46,10 +47,13 @@ export function getCategoryLabel(row: ProductRow): string {
 }
 
 export function toStorefrontProduct(row: ProductRow): Product {
+  const normalizedGender = row.gender?.trim().toLowerCase();
   const gender =
-    row.gender === "women" || row.gender === "men" || row.gender === "unisex"
-      ? row.gender
-      : undefined;
+    normalizedGender === "women" || normalizedGender === "men"
+      ? normalizedGender
+      : normalizedGender === "unisex" || normalizedGender === "mixte" || normalizedGender === "unisexe"
+        ? "unisex"
+        : undefined;
 
   return {
     id: row.id,
@@ -59,6 +63,7 @@ export function toStorefrontProduct(row: ProductRow): Product {
     image: row.image,
     hoverImage: row.hoverImage ?? undefined,
     isOnSale: row.isOnSale,
+    isPremium: row.isPremium,
     originalPrice: row.originalPrice ?? undefined,
     gender,
     tags: parseTags(row.tags),

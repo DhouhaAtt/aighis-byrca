@@ -9,6 +9,7 @@ import type { Product } from "../NewArrivals/products";
 import { useWishlist } from "../../context/WishlistContext";
 import { useLocale } from "../../context/LocaleContext";
 import { discountPercent } from "../../lib/pricing";
+import { formatTndPrice } from "../../lib/formatPrice";
 import { localizeCategoryLabel } from "../../lib/i18n/categoryLabel";
 import { getLocalizedProductCopy } from "../../lib/i18n/productCopy";
 
@@ -75,17 +76,22 @@ export default function ProductCard({ product }: Props) {
       <Link href={`/products/${product.id}`} className={styles.info}>
         <h3>{localizedName}</h3>
 
-        <p className={styles.priceRow}>
-          {showSale ? (
-            <>
-              <span className={styles.originalPrice}>{product.originalPrice}</span>
-              <span className={styles.salePrice}>{product.price}</span>
-              <span className={styles.discountBadge}>-{discount}%</span>
-            </>
-          ) : (
-            product.price
+        <div className={styles.priceMetaRow}>
+          <p className={styles.priceRow}>
+            {showSale ? (
+              <>
+                <span className={styles.originalPrice}>{formatTndPrice(product.originalPrice)}</span>
+                <span className={styles.salePrice}>{formatTndPrice(product.price)}</span>
+                <span className={styles.discountBadge}>-{discount}%</span>
+              </>
+            ) : (
+              formatTndPrice(product.price)
+            )}
+          </p>
+          {product.isPremium && (
+            <span className={styles.premiumBadge}>PREMIUM COLLECTION</span>
           )}
-        </p>
+        </div>
       </Link>
     </article>
   );

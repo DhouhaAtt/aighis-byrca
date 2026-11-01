@@ -6,7 +6,7 @@ const fr: Translations = {
     tagline: "Mode de Luxe",
   },
   nav: {
-    top: ["Mode", "Soldes", "Casa", "World", "MY AB"],
+    top: ["Mode", "Soldes", "World", "MY AB"],
     center: [
       "COLLECTION ÉTÉ",
       "CADEAUX",
@@ -41,8 +41,8 @@ const fr: Translations = {
     ],
   },
   search: { placeholder: "Rechercher une catégorie ou un produit…", browseCategories: "Parcourir les catégories", noResults: "Aucun résultat" },
-  filters: { filters: "Filtres", all: "Tout", gender: "Genre", genders: { women: "Femme", men: "Homme", unisex: "Mixte" }, price: "Prix", size: "Taille", color: "Couleur", allColors: "Toutes les couleurs", clear: "Effacer tous les filtres", noProducts: "Aucun produit ne correspond à vos filtres.", product: "produit", products: "produits" },
-  contactPage: { subtitle: "Contactez-nous", thankYou: "Merci", received: "Votre message a bien été envoyé. Nous vous répondrons dans les meilleurs délais.", backHome: "Retour à l’accueil", title: "Nous sommes à votre écoute", description: "Une question sur nos collections, besoin d’un conseil de style ou envie de nous faire part de vos impressions ? Nous sommes là pour vous.", name: "Nom", yourName: "Votre nom", email: "E-mail", yourEmail: "Votre adresse e-mail", message: "Message", messagePlaceholder: "Écrivez votre message…", send: "Envoyer le message", sending: "Envoi en cours…", sendError: "Nous n’avons pas pu envoyer votre message. Réessayez ou écrivez-nous à contact@aighisbyrca.com." },
+  filters: { filters: "Filtres", all: "Tout", gender: "Genre", genders: { women: "Femme", men: "Homme", unisex: "Mixte" }, price: "Prix", size: "Taille", color: "Couleur", allColors: "Toutes les couleurs", clear: "Effacer tous les filtres", resetPrice: "Réinitialiser le prix", noProducts: "Aucun produit ne correspond à vos filtres.", product: "produit", products: "produits" },
+  contactPage: { subtitle: "Contactez-nous", thankYou: "Merci", received: "Votre message a bien été envoyé. Nous vous répondrons dans les meilleurs délais.", backHome: "Retour à l’accueil", title: "Nous sommes à votre écoute", description: "Une question sur nos collections, besoin d’un conseil de style ou envie de nous faire part de vos impressions ? Nous sommes là pour vous.", name: "Nom", yourName: "Votre nom", email: "E-mail", yourEmail: "Votre adresse e-mail", message: "Message", messagePlaceholder: "Écrivez votre message…", send: "Envoyer le message", sending: "Envoi en cours…", sendError: "Nous n’avons pas pu envoyer votre message. Réessayez ou écrivez-nous à aighisbyrca@gmail.com." },
   outfitBuilder: {
     title: "Créez votre tenue", subtitle: "Répondez à quelques questions et laissez-nous vous conseiller",
     resultsTitle: "Votre tenue personnalisée", resultsSubtitle: "Un look complet composé pour vous", resultsEyebrow: "Votre look personnalisé",
@@ -188,7 +188,8 @@ const fr: Translations = {
     returns: "RETOURS",
     legalArea: "MENTIONS LÉGALES",
     contact: "CONTACT",
-    followUs: "NOUS SUIVRE",
+    followUs: "SUIVEZ-NOUS !",
+    emailUs: "OU ÉCRIVEZ-NOUS PAR E-MAIL !",
     countryLanguage: "PAYS & LANGUE",
     tunisia: "Tunisie",
     english: "Anglais",
