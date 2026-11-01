@@ -41,6 +41,11 @@
     inset:12.5%;
 }
 
+.productFitWrapper{
+
+    inset:15%;
+}
+
 .image{
 
     object-fit:cover;
@@ -51,6 +56,18 @@
 .card:hover .image{
 
     transform:scale(1.06);
+}
+
+.productFitImage{
+
+    object-fit:contain;
+
+    object-position:center;
+}
+
+.card:hover .productFitImage{
+
+    transform:none;
 }
 
 .overlay{

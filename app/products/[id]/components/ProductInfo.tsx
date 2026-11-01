@@ -12,6 +12,7 @@ import { useLocale } from "../../../context/LocaleContext";
 import VariantSelector from "./VariantSelector";
 import SizeSelector from "./SizeSelector";
 import AddToCart from "./AddToCart";
+import { useProductSelection } from "./ProductSelectionContext";
 import { discountPercent } from "../../../lib/pricing";
 import { localizeCategoryLabel } from "../../../lib/i18n/categoryLabel";
 
@@ -20,7 +21,7 @@ interface Props {
 }
 
 export default function ProductInfo({ product }: Props) {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  const { selectedColor, setSelectedColor } = useProductSelection();
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? "");
   const { isLiked, toggleItem } = useWishlist();
   const { t } = useLocale();
@@ -49,7 +50,7 @@ export default function ProductInfo({ product }: Props) {
 
       <p className={styles.category}>{localizedCategory}</p>
 
-      {product.colors.length > 0 && (
+      {product.colors.length > 0 && selectedColor && (
         <VariantSelector
           variants={product.colors}
           selected={selectedColor}
@@ -73,7 +74,7 @@ export default function ProductInfo({ product }: Props) {
             name: localizedName,
             price: product.price,
             category: product.category,
-            image: product.images[0],
+            image: selectedColor?.image || product.images[0],
           }}
           size={selectedSize}
           color={selectedColor?.name ?? null}

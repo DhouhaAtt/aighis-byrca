@@ -13,10 +13,11 @@ export interface ProductDetail {
   careInstructions: string[];
   images: string[];
   thumbnailImages: string[];
-  colors: { name: string; hex: string }[];
+  colors: { name: string; hex: string; image?: string | null }[];
   sizes: string[];
   shipping: string;
   returns: string;
+  recolorMask?: string | null;
 }
 
 export const productDetails: ProductDetail[] = [

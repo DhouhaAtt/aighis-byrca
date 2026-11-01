@@ -40,6 +40,7 @@ model Product {
   sizes            String?
   shipping         String?
   returns          String?
+  recolorMask      String?
   categoryId       Int?
   category         Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   variants         ProductVariant[]

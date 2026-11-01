@@ -109,6 +109,7 @@ export const ProductScalarFieldEnum = {
   sizes: 'sizes',
   shipping: 'shipping',
   returns: 'returns',
+  recolorMask: 'recolorMask',
   categoryId: 'categoryId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

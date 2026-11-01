@@ -94,12 +94,12 @@ async function restockOrderItems(orderId: number): Promise<void> {
 
   for (const item of items) {
     if (item.variantId !== null) {
-      await prisma.productVariant.update({
+      await prisma.productVariant.updateMany({
         where: { id: item.variantId },
         data: { stock: { increment: item.quantity } },
       });
     } else if (item.productId !== null) {
-      await prisma.product.update({
+      await prisma.product.updateMany({
         where: { id: item.productId },
         data: { stock: { increment: item.quantity } },
       });
@@ -120,7 +120,7 @@ async function restockOrderItems(orderId: number): Promise<void> {
       where: { productId },
       _sum: { stock: true },
     });
-    await prisma.product.update({
+    await prisma.product.updateMany({
       where: { id: productId },
       data: { stock: aggregate._sum.stock ?? 0 },
     });
@@ -282,12 +282,12 @@ export const orderRepository = {
       if (wasActive && becomesInactive) {
         for (const item of existing.items) {
           if (item.variantId !== null) {
-            await tx.productVariant.update({
+            await tx.productVariant.updateMany({
               where: { id: item.variantId },
               data: { stock: { increment: item.quantity } },
             });
           } else if (item.productId !== null) {
-            await tx.product.update({
+            await tx.product.updateMany({
               where: { id: item.productId },
               data: { stock: { increment: item.quantity } },
             });
@@ -307,7 +307,7 @@ export const orderRepository = {
             where: { productId },
             _sum: { stock: true },
           });
-          await tx.product.update({
+          await tx.product.updateMany({
             where: { id: productId },
             data: { stock: aggregate._sum.stock ?? 0 },
           });

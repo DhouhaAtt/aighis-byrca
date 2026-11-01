@@ -74,6 +74,7 @@ export function getFallbackRows(): ProductRow[] {
       sizes: toJson(product.sizes ?? detail?.sizes ?? []),
       shipping: detail?.shipping ?? null,
       returns: detail?.returns ?? null,
+      recolorMask: null,
       categoryId: null,
       category: { id: 0, name, slug: slugify(name) },
     } satisfies ProductRow;

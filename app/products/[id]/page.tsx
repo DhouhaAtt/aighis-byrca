@@ -6,6 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import ProductDetailHeading from "./components/ProductDetailHeading";
 import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
+import { ProductSelectionProvider } from "./components/ProductSelectionContext";
 import ProductAccordion from "./components/ProductAccordion";
 import RelatedProducts from "./components/RelatedProducts";
 
@@ -57,6 +58,7 @@ function toProductDetail(
     sizes: parseSizes(row.sizes),
     shipping: SHIPPING_INFO,
     returns: RETURNS_INFO,
+    recolorMask: row.recolorMask ?? null,
   };
 }
 
@@ -83,11 +85,17 @@ export default async function ProductDetailPage({ params }: Props) {
       <ProductDetailHeading product={product} />
 
       <main className={styles.page}>
-        <div className={styles.layout}>
-          <ProductGallery images={product.images} name={product.name} />
+        <ProductSelectionProvider colors={product.colors}>
+          <div className={styles.layout}>
+            <ProductGallery
+              images={product.images}
+              name={product.name}
+              recolorMask={product.recolorMask}
+            />
 
-          <ProductInfo product={product} />
-        </div>
+            <ProductInfo product={product} />
+          </div>
+        </ProductSelectionProvider>
 
         <ProductAccordion product={product} />
 

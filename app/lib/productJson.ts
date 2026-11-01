@@ -32,12 +32,21 @@ export function parseSizes(value: string | null | undefined): string[] {
 export interface ColorOption {
   name: string;
   hex: string;
+  image?: string | null;
 }
 
 export function parseColors(value: string | null | undefined): ColorOption[] {
   const asJson = parseJson<ColorOption[]>(value);
   if (!Array.isArray(asJson)) return [];
-  return asJson.filter((color) => color && color.hex);
+  return asJson
+    .filter((color) => color && color.hex)
+    .map((color) => ({
+      name: String(color.name ?? color.hex),
+      hex: String(color.hex),
+      ...(typeof color.image === "string" && color.image.trim() !== ""
+        ? { image: color.image }
+        : {}),
+    }));
 }
 
 export function parseImages(value: string | null | undefined): string[] {

@@ -22,6 +22,7 @@ export interface CreateProductInput {
   sizes?: string | null;
   shipping?: string | null;
   returns?: string | null;
+  recolorMask?: string | null;
   categoryId?: number | null;
 }
 
@@ -39,6 +40,13 @@ export const productRepository = {
     return prisma.product.findUnique({
       where: { id },
       include: { category: true, variants: { orderBy: { id: "asc" } } },
+    });
+  },
+
+  async findStorefrontById(id: number) {
+    return prisma.product.findUnique({
+      where: { id },
+      include: { category: true },
     });
   },
 

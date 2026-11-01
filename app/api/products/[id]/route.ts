@@ -60,6 +60,8 @@ export async function PUT(
       sizes: body.sizes ?? existing.sizes,
       shipping: body.shipping ?? existing.shipping,
       returns: body.returns ?? existing.returns,
+      recolorMask:
+        body.recolorMask !== undefined ? body.recolorMask : existing.recolorMask,
       categoryId: body.categoryId !== undefined ? body.categoryId : existing.categoryId,
     });
 
@@ -70,9 +72,13 @@ export async function PUT(
 
     const full = await productRepository.findById(updated.id);
     return NextResponse.json(full);
-  } catch {
+  } catch (error) {
+    console.error("Failed to update product", error);
     return NextResponse.json(
-      { error: "Failed to update product" },
+      {
+        error: "Failed to update product",
+        detail: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }

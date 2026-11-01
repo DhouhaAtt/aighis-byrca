@@ -59,6 +59,9 @@ export async function getNewArrivals(): Promise<Product[]> {
   const rows = await fetchRows();
   return rows
     .filter((row) => row.isNewArrival)
+    // Product IDs are assigned in creation order, so newest arrivals belong
+    // at the front of the storefront carousel.
+    .sort((a, b) => b.id - a.id)
     .map(toStorefrontProduct);
 }
 
@@ -93,7 +96,7 @@ export async function getProductById(
 ): Promise<ProductDetailRow | null> {
   try {
     await connection();
-    const product = await productRepository.findById(id);
+    const product = await productRepository.findStorefrontById(id);
     if (product) return product;
   } catch (error) {
     console.error("[storefront] database unavailable, using fallback", error);

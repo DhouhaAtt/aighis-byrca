@@ -12,7 +12,7 @@ export interface Product {
   gender?: "women" | "men" | "unisex";
   tags?: string[];
   sizes?: string[];
-  colors?: { name: string; hex: string }[];
+  colors?: { name: string; hex: string; image?: string | null }[];
 }
 
 export const womenProducts: Product[] = [

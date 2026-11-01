@@ -1,0 +1,309 @@
+.studio {
+  border: 1px solid #eee;
+  background: #fafafa;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #888;
+}
+
+.detectBtn {
+  height: 38px;
+  padding: 0 18px;
+  background: #111;
+  color: #fff;
+  border: none;
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.detectBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.warning {
+  margin: 0;
+  padding: 8px 10px;
+  background: #fff8e1;
+  border-left: 3px solid #d9a441;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8a6a12;
+}
+
+.error {
+  margin: 0;
+  padding: 8px 10px;
+  background: #fdecea;
+  border-left: 3px solid #c62828;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8e1d1d;
+}
+
+.maskMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.sourceDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorToolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolGroup {
+  display: flex;
+  gap: 0;
+}
+
+.toolBtn,
+.clearBtn {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: #555;
+  cursor: pointer;
+}
+
+.toolBtn + .toolBtn {
+  border-left: none;
+}
+
+.toolBtnActive {
+  background: #111;
+  border-color: #111;
+  color: #fff;
+}
+
+.clearBtn {
+  margin-left: auto;
+  color: #c62828;
+  border-color: #f0d5d5;
+}
+
+.brushControl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.brushControl input {
+  width: 90px;
+}
+
+.brushControl span {
+  min-width: 38px;
+  color: #555;
+}
+
+.editorCanvasWrap {
+  position: relative;
+  align-self: center;
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid #eee;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.editorCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.editorOverlay {
+  position: absolute;
+  inset: 0;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.editorLoading,
+.editorError {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 11px;
+  color: #888;
+  line-height: 1.4;
+  padding: 16px;
+  text-align: center;
+}
+
+.editorError {
+  color: #c62828;
+}
+
+.previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.previewCard {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.previewThumb {
+  aspect-ratio: 1 / 1;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.previewThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewEmpty {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(17, 17, 17, 0.18);
+  border-top-color: #111;
+  border-radius: 50%;
+  animation: previewSpin 0.8s linear infinite;
+}
+
+@keyframes previewSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.previewMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.previewName {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #333;
+}
+
+.previewHex {
+  font-size: 9px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.overrideRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.overrideBtn {
+  position: relative;
+  padding: 3px 7px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #666;
+  cursor: pointer;
+}
+
+.overrideBtn input {
+  display: none;
+}
+
+.removeOverride {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 9px;
+  color: #c62828;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.overrideNote {
+  font-size: 9px;
+  line-height: 1.45;
+  color: #aaa;
+}

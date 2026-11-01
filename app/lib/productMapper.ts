@@ -30,6 +30,7 @@ export interface ProductRow {
   sizes: string | null;
   shipping: string | null;
   returns: string | null;
+  recolorMask?: string | null;
   categoryId: number | null;
   category: { id: number; name: string; slug: string } | null;
 }

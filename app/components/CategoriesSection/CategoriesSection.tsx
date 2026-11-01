@@ -28,31 +28,44 @@ export default function CategoriesSection() {
   return (
     <section className={styles.section}>
       <div className={styles.grid}>
-        {categories.map((category) => (
-          <article key={category.id} className={styles.card}>
-            <Link href={category.href} className={styles.link}>
-              <div className={styles.imageWrapper}>
-                <Image
-                  src={category.image}
-                  alt={titles[category.id]}
-                  fill
-                  className={styles.image}
-                />
-              </div>
+        {categories.map((category) => {
+          const isProductCard = category.id === 3 || category.id === 4;
 
-              <div className={styles.overlay} />
+          return (
+            <article key={category.id} className={styles.card}>
+              <Link href={category.href} className={styles.link}>
+                <div
+                  className={`${styles.imageWrapper} ${
+                    isProductCard ? styles.productFitWrapper : ""
+                  }`}
+                >
+                  <Image
+                    src={category.image}
+                    alt={titles[category.id]}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className={
+                      isProductCard
+                        ? `${styles.image} ${styles.productFitImage}`
+                        : styles.image
+                    }
+                  />
+                </div>
 
-              <div className={styles.content}>
-                <h2 className={styles.title}>{titles[category.id]}</h2>
+                <div className={styles.overlay} />
 
-                <span className={styles.action}>
-                  {t.home.discover}
-                  <ArrowRight size={14} strokeWidth={1.5} />
-                </span>
-              </div>
-            </Link>
-          </article>
-        ))}
+                <div className={styles.content}>
+                  <h2 className={styles.title}>{titles[category.id]}</h2>
+
+                  <span className={styles.action}>
+                    {t.home.discover}
+                    <ArrowRight size={14} strokeWidth={1.5} />
+                  </span>
+                </div>
+              </Link>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

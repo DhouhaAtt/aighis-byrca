@@ -387,6 +387,18 @@
   color: #333;
 }
 
+.selectedTagPrimary {
+  box-shadow: inset 0 0 0 1px #111;
+  background: #fff;
+}
+
+.principalTag {
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #111;
+}
+
 .selectedTagRemove {
   background: none;
   border: none;

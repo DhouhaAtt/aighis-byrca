@@ -2,8 +2,12 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { Edit3, Trash2, X, Upload, Check } from "lucide-react";
+import { Edit3, Trash2, X, Upload, Check, Star } from "lucide-react";
 import styles from "../AdminTable.module.css";
+
+import { parseRecolorMask, serializeRecolorMask } from "../../../lib/recolor/types";
+import type { RecolorMaskProfile } from "../../../lib/recolor/types";
+import RecolorStudio from "./RecolorStudio";
 
 interface Product {
   id: number;
@@ -28,6 +32,7 @@ interface Product {
   sizes: string | null;
   shipping: string | null;
   returns: string | null;
+  recolorMask: string | null;
   category: { id: number; name: string } | null;
 }
 
@@ -39,6 +44,7 @@ interface Category {
 interface ColorOption {
   name: string;
   hex: string;
+  image?: string | null;
 }
 
 interface VariantRow {
@@ -95,6 +101,7 @@ const emptyForm = {
   sizes: [] as string[],
   categoryId: "",
   extraImages: [] as string[],
+  recolorMask: null as RecolorMaskProfile | null,
 };
 
 const PER_PAGE = 10;
@@ -175,7 +182,13 @@ function parseColorsValue(value: string | null): ColorOption[] {
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter((c): c is ColorOption => Boolean(c) && typeof c === "object" && "hex" in c)
-      .map((c) => ({ name: String(c.name ?? c.hex), hex: String(c.hex) }));
+      .map((c) => ({
+        name: String(c.name ?? c.hex),
+        hex: String(c.hex),
+        ...(typeof c.image === "string" && c.image.trim() !== ""
+          ? { image: c.image }
+          : {}),
+      }));
   } catch {
     return [];
   }
@@ -297,6 +310,7 @@ export default function AdminProductsPage() {
   const [extraUploading, setExtraUploading] = useState(false);
   const [variantStock, setVariantStock] = useState<Record<string, number>>({});
   const [variantsLoading, setVariantsLoading] = useState(false);
+  const [customColor, setCustomColor] = useState({ name: "", hex: "#111111" });
 
   const showSnackbar = useCallback((type: "success" | "error", message: string) => {
     setSnackbar({ type, message });
@@ -334,8 +348,6 @@ export default function AdminProductsPage() {
     [filtered, page]
   );
 
-  useEffect(() => { setPage(1); }, [search]);
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -351,6 +363,7 @@ export default function AdminProductsPage() {
     setEditing(null);
     setForm(emptyForm);
     setVariantStock({});
+    setCustomColor({ name: "", hex: "#111111" });
     setShowModal(true);
   }, []);
 
@@ -377,6 +390,7 @@ export default function AdminProductsPage() {
       sizes: sortSizes(parseSizesValue(product.sizes)),
       categoryId: product.category?.id ? String(product.category.id) : "",
       extraImages: parseExtraImages(product.images),
+      recolorMask: parseRecolorMask(product.recolorMask),
     });
     setVariantStock({});
     setVariantsLoading(true);
@@ -438,12 +452,52 @@ export default function AdminProductsPage() {
     }));
   }, []);
 
+  const setPrincipalColor = useCallback((hex: string) => {
+    setForm((f) => {
+      const index = f.colors.findIndex(
+        (color) => color.hex.toLowerCase() === hex.toLowerCase()
+      );
+      if (index <= 0) return f;
+      const colors = [...f.colors];
+      const [principal] = colors.splice(index, 1);
+      colors.unshift(principal);
+      return { ...f, colors };
+    });
+  }, []);
+
   const toggleColor = useCallback((color: ColorOption) => {
     setForm((f) => ({
       ...f,
       colors: f.colors.some((c) => c.hex.toLowerCase() === color.hex.toLowerCase())
         ? f.colors.filter((c) => c.hex.toLowerCase() !== color.hex.toLowerCase())
         : [...f.colors, color],
+    }));
+  }, []);
+
+  const addCustomColor = useCallback(() => {
+    const hex = customColor.hex.trim();
+    if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex)) {
+      showSnackbar("error", "Code hexadécimal invalide");
+      return;
+    }
+    const name = customColor.name.trim() || hex;
+    setForm((f) => {
+      if (f.colors.some((color) => color.hex.toLowerCase() === hex.toLowerCase())) {
+        return f;
+      }
+      return { ...f, colors: [...f.colors, { name, hex }] };
+    });
+    setCustomColor({ name: "", hex: "#111111" });
+  }, [customColor, showSnackbar]);
+
+  const setColorImage = useCallback((hex: string, image: string | null) => {
+    setForm((f) => ({
+      ...f,
+      colors: f.colors.map((color) =>
+        color.hex.toLowerCase() === hex.toLowerCase()
+          ? { ...color, ...(image ? { image } : { image: null }) }
+          : color
+      ),
     }));
   }, []);
 
@@ -486,6 +540,7 @@ export default function AdminProductsPage() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (variantsLoading) return;
       const payload = {
         name: form.name,
         price: form.price,
@@ -508,6 +563,10 @@ export default function AdminProductsPage() {
         images: form.extraImages.length ? JSON.stringify(form.extraImages) : null,
         colors: form.colors.length ? JSON.stringify(form.colors) : null,
         sizes: form.sizes.length ? JSON.stringify(form.sizes) : null,
+        recolorMask:
+          form.recolorMask && form.recolorMask.sourceImage === form.image
+            ? serializeRecolorMask(form.recolorMask)
+            : null,
         categoryId: form.categoryId ? Number(form.categoryId) : null,
         variants: variantRows.map((row) => ({
           size: row.size,
@@ -551,7 +610,7 @@ export default function AdminProductsPage() {
         showSnackbar("error", "Y a un problème, impossible de sauvegarder");
       }
     },
-    [form, editing, showSnackbar, variantRows, variantStock]
+    [form, editing, showSnackbar, variantRows, variantStock, variantsLoading]
   );
 
   const confirmDelete = useCallback(async () => {
@@ -613,7 +672,10 @@ export default function AdminProductsPage() {
           className={styles.searchInput}
           placeholder="Rechercher un produit…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
         />
         <button className={styles.addBtn} onClick={openAdd}>
           Ajouter un produit
@@ -727,10 +789,28 @@ export default function AdminProductsPage() {
                 <ImageUpload
                   label="Image principale"
                   value={form.image}
-                  onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+                  onChange={(url) =>
+                    setForm((f) => ({
+                      ...f,
+                      image: url,
+                      recolorMask:
+                        f.recolorMask && f.recolorMask.sourceImage !== url
+                          ? null
+                          : f.recolorMask,
+                    }))
+                  }
                   onUpload={async (files) => {
                     const urls = await uploadFiles(files);
-                    if (urls[0]) setForm((f) => ({ ...f, image: urls[0] }));
+                    if (urls[0]) {
+                      setForm((f) => ({
+                        ...f,
+                        image: urls[0],
+                        recolorMask:
+                          f.recolorMask && f.recolorMask.sourceImage !== urls[0]
+                            ? null
+                            : f.recolorMask,
+                      }));
+                    }
                   }}
                 />
 
@@ -890,30 +970,100 @@ export default function AdminProductsPage() {
                       );
                     })}
                   </div>
+                  <div className={styles.customRow}>
+                    <input
+                      className={styles.input}
+                      value={customColor.name}
+                      onChange={(e) =>
+                        setCustomColor((current) => ({
+                          ...current,
+                          name: e.target.value,
+                        }))
+                      }
+                      placeholder="Nom de la couleur"
+                    />
+                    <input
+                      type="color"
+                      className={styles.colorInput}
+                      value={customColor.hex}
+                      onChange={(e) =>
+                        setCustomColor((current) => ({
+                          ...current,
+                          hex: e.target.value,
+                        }))
+                      }
+                      aria-label="Code couleur"
+                    />
+                    <button
+                      type="button"
+                      className={styles.chip}
+                      onClick={addCustomColor}
+                    >
+                      Ajouter
+                    </button>
+                  </div>
                   {form.colors.length > 0 && (
-                    <div className={styles.selectedRow}>
-                      {form.colors.map((color) => (
-                        <span key={color.hex} className={styles.selectedTag}>
+                    <>
+                      <div className={styles.selectedRow}>
+                        {form.colors.map((color, index) => (
                           <span
-                            className={styles.swatchDot}
-                            style={{ background: color.hex, width: 14, height: 14 }}
-                          />
-                          {color.name}
-                          <button
-                            type="button"
-                            className={styles.selectedTagRemove}
-                            onClick={() => toggleColor(color)}
-                            aria-label={`Remove ${color.name}`}
+                            key={color.hex}
+                            className={`${styles.selectedTag} ${
+                              index === 0 ? styles.selectedTagPrimary : ""
+                            }`}
                           >
-                            <X size={11} strokeWidth={2} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
+                            <span
+                              className={styles.swatchDot}
+                              style={{ background: color.hex, width: 14, height: 14 }}
+                            />
+                            {color.name}
+                            {index === 0 ? (
+                              <span className={styles.principalTag}>Principale</span>
+                            ) : (
+                              <button
+                                type="button"
+                                className={styles.selectedTagRemove}
+                                onClick={() => setPrincipalColor(color.hex)}
+                                aria-label={`Définir ${color.name} comme couleur principale`}
+                                title="Définir comme couleur principale"
+                              >
+                                <Star size={11} strokeWidth={2} />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              className={styles.selectedTagRemove}
+                              onClick={() => toggleColor(color)}
+                              aria-label={`Remove ${color.name}`}
+                            >
+                              <X size={11} strokeWidth={2} />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <span className={styles.hint}>
+                        La couleur principale utilise l&apos;image principale sans
+                        recoloriage. Choisissez une autre couleur pour la recolori.
+                      </span>
+                    </>
                   )}
                   {form.colors.length === 0 && (
                     <span className={styles.hint}>Aucune couleur sélectionnée.</span>
                   )}
+                </div>
+
+                <div className={styles.field}>
+                  <label className={styles.label}>Recoloriage automatique</label>
+                  <RecolorStudio
+                    key={form.image}
+                    image={form.image}
+                    colors={form.colors}
+                    profile={form.recolorMask}
+                    onChangeMask={(profile) =>
+                      setForm((f) => ({ ...f, recolorMask: profile }))
+                    }
+                    onSetColorImage={setColorImage}
+                  />
                 </div>
 
                 <div className={styles.field}>
@@ -1014,7 +1164,7 @@ export default function AdminProductsPage() {
               </div>
               <div className={styles.modalFooter} style={{ gap: 12 }}>
                 <button type="button" className={styles.cancelBtn} onClick={() => setShowModal(false)}>Annuler</button>
-                <button type="submit" className={styles.saveBtn}>{editing ? "Enregistrer" : "Créer"}</button>
+                <button type="submit" className={styles.saveBtn} disabled={variantsLoading}>{editing ? "Enregistrer" : "Créer"}</button>
               </div>
             </form>
           </div>

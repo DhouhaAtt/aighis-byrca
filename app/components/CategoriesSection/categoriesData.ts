@@ -32,7 +32,7 @@ export const categories: Category[] = [
     id: 4,
     title: "Enfants",
     subtitle: "Collection Enfants",
-    image: "/assets/categories/enfants.png",
+    image: "/assets/categories/enfantsboxx.png",
     href: "/category/enfants",
   },
 ];

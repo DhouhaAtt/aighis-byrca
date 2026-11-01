@@ -71,7 +71,8 @@ export async function PUT(
 
   try {
     await orderRepository.updateStatus(orderId, status, note);
-  } catch {
+  } catch (error) {
+    console.error(`[orders] failed to update order ${orderId}`, error);
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
   }
 

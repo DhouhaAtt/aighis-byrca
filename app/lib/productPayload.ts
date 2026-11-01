@@ -103,6 +103,7 @@ export function toCreateProductInput(
     sizes: toJsonList(body.sizes),
     shipping: toText(body.shipping),
     returns: toText(body.returns),
+    recolorMask: toText(body.recolorMask),
     categoryId: toNumber(body.categoryId),
   };
 }

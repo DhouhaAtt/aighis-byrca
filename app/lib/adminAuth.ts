@@ -94,10 +94,18 @@ export async function getSession(): Promise<SessionPayload | null> {
 }
 
 export function sessionCookieOptions() {
+  const secureOverride = process.env.ADMIN_COOKIE_SECURE;
+  const secure =
+    secureOverride === "true"
+      ? true
+      : secureOverride === "false"
+        ? false
+        : process.env.NODE_ENV === "production";
+
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
   };
