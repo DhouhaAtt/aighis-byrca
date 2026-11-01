@@ -68,6 +68,37 @@
   border-color: #111;
 }
 
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper .input {
+  width: 100%;
+  padding-right: 46px;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 48px;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.togglePassword:hover {
+  color: #111;
+}
+
 .error {
   font-size: 12px;
   color: #c0392b;
