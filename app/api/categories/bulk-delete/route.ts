@@ -5,8 +5,15 @@ import { isAdmin, unauthorized } from "../../../lib/requireAdmin";
 export async function POST(request: Request) {
   if (!(await isAdmin())) return unauthorized();
   try {
-    const body = await request.json();
-    const ids = Array.isArray(body?.ids) ? [...new Set(body.ids.map(Number).filter((id: number) => Number.isInteger(id) && id > 0))] : [];
+    const body = (await request.json()) as { ids?: unknown };
+    const rawIds: unknown[] = Array.isArray(body?.ids) ? body.ids : [];
+    const ids: number[] = [
+      ...new Set(
+        rawIds
+          .map((value) => Number(value))
+          .filter((id) => Number.isInteger(id) && id > 0)
+      ),
+    ];
     if (ids.length === 0) return NextResponse.json({ error: "Select at least one category." }, { status: 400 });
     const deletedCount = await prisma.$transaction(async (tx) => {
       const count = await tx.category.count({ where: { id: { in: ids } } });
